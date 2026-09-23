@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>童老大的虛擬世界</title>
+    <!-- 引入 FontAwesome 圖示 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- 1. 頂部導覽列（5個核心連結） -->
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">童老大的虛擬世界</a>
+
+            <nav class="nav-menu" id="navMenu">
+                <ul>
+                    <li><a href="#" class="active">首頁</a></li>
+                    <li><a href="#">關於我們</a></li>
+                    <li><a href="#">產品服務</a></li>
+                    <li><a href="#">最新消息</a></li>
+                    <li><a href="#">聯絡我們</a></li>
+                </ul>
+            </nav>
+
+            <div class="nav-actions">
+                <a href="#" class="btn-login">登入</a>
+                <a href="#" class="btn-signup">免費註冊</a>
+            </div>
+
+            <div class="hamburger" id="hamburger">
+                <i class="fa-solid fa-bars"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. 頁面主要內容（內文由上而下加入 5 個快速導覽連結） -->
+    <main class="main-content">
+        <div class="hero-section">
+            <h1>歡迎來到童老大的虛擬世界</h1>
+            <p>探索AI的無限可能，讓我們的生活更加美好，並充滿樂趣。</p>
+        </div>
+
+        <!-- 內文由上而下排列的 5 個核心導覽連結 -->
+        <div class="content-links-container">
+            <h3>AI生成展示專區</h3>
+            <ul class="content-links-list">
+                <li>
+                    <a href="https://www.splendor-hotel.com.tw/toung-www/004/Piano-88.html">
+                        <i class="fa-solid fa-rocket"></i>
+                        <span>88鍵標準鋼琴</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.splendor-hotel.com.tw/toung-www/009/index.html">
+                        <i class="fa-solid fa-lightbulb"></i>
+                        <span>台中日常儀表板</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.splendor-hotel.com.tw/toung-www/006/snake.html">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>貪吃蛇</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.splendor-hotel.com.tw/toung-www/007/pcman.html">
+                        <i class="fa-solid fa-tags"></i>
+                        <span>小精靈</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fa-solid fa-headset"></i>
+                        <span>還在想...</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </main>
+
+    <!-- 3. 網頁下方 Footer（包含原本的 10 個常用連結） -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-col">
+                <h3>童老大的虛擬世界</h3>
+                <p>探索AI的無限可能，讓我們的生活更加美好，並充滿樂趣。</p>
+            </div>
+
+            <div class="footer-col footer-links-col">
+                <h3>常用連結</h3>
+                <ul class="footer-links">
+                    <li><a href="#">解決方案</a></li>
+                    <li><a href="#">客戶案例</a></li>
+                    <li><a href="#">價格方案</a></li>
+                    <li><a href="#">技術文件</a></li>
+                    <li><a href="#">常見問題</a></li>
+                    <li><a href="#">資源下載</a></li>
+                    <li><a href="#">合作夥伴</a></li>
+                    <li><a href="#">人才招募</a></li>
+                    <li><a href="#">媒體報導</a></li>
+                    <li><a href="#">社會責任</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h3>聯絡我們</h3>
+                <p><i class="fa-solid fa-envelope"></i> toung888@gmail.com</p>
+                <p><i class="fa-solid fa-phone"></i> (04) 2324-6039</p>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 童老大的虛擬世界. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- JS 控制手機版選單 -->
+    <script>
+        const hamburger = document.getElementById('hamburger');
+        const navMenu = document.getElementById('navMenu');
+
+        hamburger.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            const icon = hamburger.querySelector('i');
+            if (navMenu.classList.contains('active')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-xmark');
+            } else {
+                icon.classList.remove('fa-xmark');
+                icon.classList.add('fa-bars');
+            }
+        });
+    </script>
+</body>
+</html>
