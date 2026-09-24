@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>專業動態二維碼產生器</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- qrcode.js library for QR code generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-300">
+
+    <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-brand-500 text-white p-2 rounded-xl shadow-md flex items-center justify-center w-10 h-10">
+                    <i class="fa-solid fa-qrcode text-xl"></i>
+                </div>
+                <h1 class="text-xl font-bold bg-gradient-to-r from-brand-600 to-emerald-500 bg-clip-text text-transparent">
+                    QR Craft Pro
+                </h1>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button id="themeToggle" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition text-slate-600 dark:text-slate-300">
+                    <i class="fa-solid fa-moon dark:hidden"></i>
+                    <i class="fa-solid fa-sun hidden dark:inline"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Left Panel: Content & Customization -->
+            <div class="lg:col-span-7 space-y-6">
+                
+                <!-- Content Type Selector -->
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
+                    <h2 class="text-lg font-semibold mb-4 flex items-center text-slate-900 dark:text-white">
+                        <i class="fa-solid fa-pen-to-square text-brand-500 mr-2"></i> 1. 選擇內容類型
+                    </h2>
+                    <div class="grid grid-cols-3 sm:grid-cols-6 gap-2" id="typeButtons">
+                        <button data-type="url" class="type-btn flex flex-col items-center justify-center p-3 rounded-xl border-2 border-brand-500 bg-brand-50 dark:bg-brand-950/30 text-brand-700 dark:text-brand-400 font-medium text-xs transition">
+                            <i class="fa-solid fa-link text-lg mb-1"></i>網址
+                        </button>
+                        <button data-type="text" class="type-btn flex flex-col items-center justify-center p-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-600 dark:text-slate-300 font-medium text-xs transition">
+                            <i class="fa-solid fa-font text-lg mb-1"></i>文字
+                        </button>
+                        <button data-type="email" class="type-btn flex flex-col items-center justify-center p-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-600 dark:text-slate-300 font-medium text-xs transition">
+                            <i class="fa-solid fa-envelope text-lg mb-1"></i>信件
+                        </button>
+                        <button data-type="phone" class="type-btn flex flex-col items-center justify-center p-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-600 dark:text-slate-300 font-medium text-xs transition">
+                            <i class="fa-solid fa-phone text-lg mb-1"></i>電話
+                        </button>
+                        <button data-type="sms" class="type-btn flex flex-col items-center justify-center p-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-600 dark:text-slate-300 font-medium text-xs transition">
+                            <i class="fa-solid fa-comment-sms text-lg mb-1"></i>簡訊
+                        </button>
+                        <button data-type="wifi" class="type-btn flex flex-col items-center justify-center p-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-600 dark:text-slate-300 font-medium text-xs transition">
+                            <i class="fa-solid fa-wifi text-lg mb-1"></i>Wi-Fi
+                        </button>
+                    </div>
+
+                    <!-- Dynamic Input Fields -->
+                    <div class="mt-5" id="inputContainer">
+                        <!-- URL Input (Default) -->
+                        <div class="input-form" data-for="url">
+                            <label class="block text-sm font-medium mb-1.5">網址 (URL)</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"><i class="fa-solid fa-globe"></i></span>
+                                <input type="url" id="val-url" value="https://example.com" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent focus:ring-2 focus:ring-brand-500 focus:outline-none transition" placeholder="https://">
+                            </div>
+                        </div>
+                        <!-- Text Input -->
+                        <div class="input-form hidden" data-for="text">
+                            <label class="block text-sm font-medium mb-1.5">內文文字</label>
+                            <textarea id="val-text" rows="3" class="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent focus:ring-2 focus:ring-brand-500 focus:outline-none transition" placeholder="請輸入任意文字內容...">Hello World!</textarea>
+                        </div>
+                        <!-- Email Input -->
+                        <div class="input-form hidden" data-for="email">
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">電子郵件地址</label>
+                                    <input type="email" id="val-email-addr" value="name@example.com" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">郵件主旨</label>
+                                    <input type="text" id="val-email-subj" value="詢問合作" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">郵件內容</label>
+                                    <textarea id="val-email-body" rows="2" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent focus:ring-2 focus:ring-brand-500 focus:outline-none">您好，我想了解更多資訊。</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Phone Input -->
+                        <div class="input-form hidden" data-for="phone">
+                            <label class="block text-sm font-medium mb-1.5">電話號碼</label>
+                            <input type="tel" id="val-phone" value="+886912345678" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+                        <!-- SMS Input -->
+                        <div class="input-form hidden" data-for="sms">
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">接收電話</label>
+                                    <input type="tel" id="val-sms-phone" value="+886912345678" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">簡訊內容</label>
+                                    <textarea id="val-sms-msg" rows="2" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent focus:ring-2 focus:ring-brand-500 focus:outline-none">您好，我想預約...</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Wi-Fi Input -->
+                        <div class="input-form hidden" data-for="wifi">
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Wi-Fi 名稱 (SSID)</label>
+                                    <input type="text" id="val-wifi-ssid" value="MyHome_WiFi" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">密碼</label>
+                                    <input type="text" id="val-wifi-pass" value="password123" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">加密類型</label>
+                                    <select id="val-wifi-type" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                        <option value="WPA">WPA/WPA2</option>
+                                        <option value="WEP">WEP</option>
+                                        <option value="nopass">無加密</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customization Panel -->
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-5">
+                    <h2 class="text-lg font-semibold flex items-center text-slate-900 dark:text-white">
+                        <i class="fa-solid fa-palette text-brand-500 mr-2"></i> 2. 外觀與進階設定
+                    </h2>
+
+                    <!-- Colors -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1.5">前景色 (QR 顏色)</label>
+                            <div class="flex items-center space-x-2">
+                                <input type="color" id="colorDark" value="#0f172a" class="w-10 h-10 rounded-xl cursor-pointer border-0 bg-transparent">
+                                <input type="text" id="colorDarkText" value="#0f172a" class="w-full p-2 text-sm rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent uppercase">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1.5">背景顏色</label>
+                            <div class="flex items-center space-x-2">
+                                <input type="color" id="colorLight" value="#ffffff" class="w-10 h-10 rounded-xl cursor-pointer border-0 bg-transparent">
+                                <input type="text" id="colorLightText" value="#ffffff" class="w-full p-2 text-sm rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent uppercase">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Error Correction Level -->
+                    <div>
+                        <label class="block text-sm font-medium mb-1.5 flex justify-between">
+                            <span>容錯率 (Error Correction)</span>
+                            <span class="text-xs text-slate-400">容許污損比例</span>
+                        </label>
+                        <div class="grid grid-cols-4 gap-2" id="correctionLevel">
+                            <button data-level="L" class="py-2 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 hover:border-brand-500 transition">L (7%)</button>
+                            <button data-level="M" class="py-2 text-xs font-semibold rounded-xl border border-brand-500 bg-brand-50 dark:bg-brand-950/30 text-brand-700 dark:text-brand-400 transition">M (15%)</button>
+                            <button data-level="Q" class="py-2 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 hover:border-brand-500 transition">Q (25%)</button>
+                            <button data-level="H" class="py-2 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 hover:border-brand-500 transition">H (30%)</button>
+                        </div>
+                    </div>
+
+                    <!-- Center Logo Preset / Custom -->
+                    <div>
+                        <label class="block text-sm font-medium mb-1.5">中央圖示 (Logo)</label>
+                        <div class="grid grid-cols-5 gap-2" id="logoPresets">
+                            <button data-logo="" class="logo-btn p-2 rounded-xl border-2 border-brand-500 bg-brand-50 dark:bg-brand-950/30 flex items-center justify-center text-sm font-medium transition">無</button>
+                            <button data-logo="fa-solid fa-globe" class="logo-btn p-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center text-lg transition"><i class="fa-solid fa-globe"></i></button>
+                            <button data-logo="fa-solid fa-heart" class="logo-btn p-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center text-lg text-rose-500 transition"><i class="fa-solid fa-heart"></i></button>
+                            <button data-logo="fa-solid fa-bolt" class="logo-btn p-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center text-lg text-amber-500 transition"><i class="fa-solid fa-bolt"></i></button>
+                            <button data-logo="fa-solid fa-shield-halved" class="logo-btn p-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center text-lg text-blue-500 transition"><i class="fa-solid fa-shield-halved"></i></button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Right Panel: Real-time Preview & Export -->
+            <div class="lg:col-span-5">
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 sticky top-24 flex flex-col items-center">
+                    <h2 class="text-lg font-semibold w-full text-left mb-6 flex items-center text-slate-900 dark:text-white">
+                        <i class="fa-solid fa-eye text-brand-500 mr-2"></i> 3. 即時預覽與下載
+                    </h2>
+
+                    <!-- QR Code Canvas Container -->
+                    <div class="relative p-6 bg-slate-50 dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-inner group">
+                        <div id="qrcode" class="flex items-center justify-center"></div>
+                        <!-- Center Logo Overlay -->
+                        <div id="centerLogoBadge" class="absolute w-12 h-12 bg-white dark:bg-slate-800 rounded-2xl shadow-lg border-2 border-slate-100 dark:border-slate-700 hidden items-center justify-center text-xl">
+                            <i id="centerLogoIcon" class=""></i>
+                        </div>
+                    </div>
+
+                    <!-- Status Indicator -->
+                    <div class="mt-4 flex items-center text-xs text-slate-500 dark:text-slate-400 space-x-1.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>已自動即時更新</span>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="mt-6 w-full space-y-3">
+                        <button id="downloadPng" class="w-full py-3 px-4 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-xl shadow-lg shadow-brand-500/25 transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-download"></i>
+                            <span>下載高畫質 PNG</span>
+                        </button>
+                        <button id="downloadSvg" class="w-full py-3 px-4 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold rounded-xl transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-file-code"></i>
+                            <span>複製 SVG 原始碼</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-5 py-3 rounded-2xl shadow-xl flex items-center space-x-3 z-50">
+        <i class="fa-solid fa-circle-check text-brand-500 text-lg"></i>
+        <span id="toastMsg" class="text-sm font-medium">動作成功完成！</span>
+    </div>
+
+    <script>
+        // State management
+        let currentType = 'url';
+        let qrColorDark = '#0f172a';
+        let qrColorLight = '#ffffff';
+        let qrCorrectionLevel = 'M';
+        let selectedLogo = '';
+        let qrcodeInstance = null;
+
+        // Initialize QR code container
+        const qrContainer = document.getElementById('qrcode');
+
+        function generateQR() {
+            // Clear existing QR
+            qrContainer.innerHTML = '';
+
+            // Get content based on active type
+            let textData = '';
+            if (currentType === 'url') {
+                textData = document.getElementById('val-url').value.trim() || 'https://example.com';
+            } else if (currentType === 'text') {
+                textData = document.getElementById('val-text').value.trim() || 'Hello World!';
+            } else if (currentType === 'email') {
+                const addr = document.getElementById('val-email-addr').value.trim();
+                const subj = encodeURIComponent(document.getElementById('val-email-subj').value.trim());
+                const body = encodeURIComponent(document.getElementById('val-email-body').value.trim());
+                textData = `mailto:${addr}?subject=${subj}&body=${body}`;
+            } else if (currentType === 'phone') {
+                const phone = document.getElementById('val-phone').value.trim();
+                textData = `tel:${phone}`;
+            } else if (currentType === 'sms') {
+                const phone = document.getElementById('val-sms-phone').value.trim();
+                const msg = document.getElementById('val-sms-msg').value.trim();
+                textData = `SMSTO:${phone}:${msg}`;
+            } else if (currentType === 'wifi') {
+                const ssid = document.getElementById('val-wifi-ssid').value.trim();
+                const pass = document.getElementById('val-wifi-pass').value.trim();
+                const type = document.getElementById('val-wifi-type').value;
+                textData = `WIFI:T:${type};S:${ssid};P:${pass};;`;
+            }
+
+            // Map correction level string to QRCode object constant
+            let errorCorrectLevel = QRCode.CorrectLevel.M;
+            if (qrCorrectionLevel === 'L') errorCorrectLevel = QRCode.CorrectLevel.L;
+            if (qrCorrectionLevel === 'Q') errorCorrectLevel = QRCode.CorrectLevel.Q;
+            if (qrCorrectionLevel === 'H') errorCorrectLevel = QRCode.CorrectLevel.H;
+
+            // Generate using qrcode.js
+            try {
+                qrcodeInstance = new QRCode(qrContainer, {
+                    text: textData,
+                    width: 220,
+                    height: 220,
+                    colorDark: qrColorDark,
+                    colorLight: qrColorLight,
+                    correctLevel: errorCorrectLevel
+                });
+            } catch (e) {
+                console.error(e);
+            }
+
+            // Handle center logo badge
+            const badge = document.getElementById('centerLogoBadge');
+            const icon = document.getElementById('centerLogoIcon');
+            if (selectedLogo) {
+                icon.className = selectedLogo;
+                badge.classList.remove('hidden');
+                badge.classList.add('flex');
+            } else {
+                badge.classList.remove('flex');
+                badge.classList.add('hidden');
+            }
+        }
+
+        // Event Listeners setup
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initial render
+            generateQR();
+
+            // Type Switching
+            const typeButtons = document.querySelectorAll('.type-btn');
+            const inputForms = document.querySelectorAll('.input-form');
+
+            typeButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    typeButtons.forEach(b => {
+                        b.classList.remove('border-brand-500', 'bg-brand-50', 'dark:bg-brand-950/30', 'text-brand-700', 'dark:text-brand-400');
+                        b.classList.add('border-slate-200', 'dark:border-slate-700', 'text-slate-600', 'dark:text-slate-300');
+                    });
+                    btn.classList.add('border-brand-500', 'bg-brand-50', 'dark:bg-brand-950/30', 'text-brand-700', 'dark:text-brand-400');
+                    btn.classList.remove('border-slate-200', 'dark:border-slate-700', 'text-slate-600', 'dark:text-slate-300');
+
+                    currentType = btn.getAttribute('data-type');
+                    inputForms.forEach(form => {
+                        if (form.getAttribute('data-for') === currentType) {
+                            form.classList.remove('hidden');
+                        } else {
+                            form.classList.add('hidden');
+                        }
+                    });
+                    generateQR();
+                });
+            });
+
+            // Input changes trigger regeneration
+            document.querySelectorAll('input, textarea, select').forEach(el => {
+                el.addEventListener('input', generateQR);
+                el.addEventListener('change', generateQR);
+            });
+
+            // Color Pickers sync
+            const colorDarkInput = document.getElementById('colorDark');
+            const colorDarkText = document.getElementById('colorDarkText');
+            const colorLightInput = document.getElementById('colorLight');
+            const colorLightText = document.getElementById('colorLightText');
+
+            colorDarkInput.addEventListener('input', (e) => {
+                colorDarkText.value = e.target.value;
+                qrColorDark = e.target.value;
+                generateQR();
+            });
+            colorDarkText.addEventListener('input', (e) => {
+                if(e.target.value.startsWith('#') && e.target.value.length === 7) {
+                    colorDarkInput.value = e.target.value;
+                    qrColorDark = e.target.value;
+                    generateQR();
+                }
+            });
+
+            colorLightInput.addEventListener('input', (e) => {
+                colorLightText.value = e.target.value;
+                qrColorLight = e.target.value;
+                generateQR();
+            });
+            colorLightText.addEventListener('input', (e) => {
+                if(e.target.value.startsWith('#') && e.target.value.length === 7) {
+                    colorLightInput.value = e.target.value;
+                    qrColorLight = e.target.value;
+                    generateQR();
+                }
+            });
+
+            // Correction Level Buttons
+            const levelButtons = document.querySelectorAll('#correctionLevel button');
+            levelButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    levelButtons.forEach(b => {
+                        b.classList.remove('border-brand-500', 'bg-brand-50', 'dark:bg-brand-950/30', 'text-brand-700', 'dark:text-brand-400');
+                    });
+                    btn.classList.add('border-brand-500', 'bg-brand-50', 'dark:bg-brand-950/30', 'text-brand-700', 'dark:text-brand-400');
+                    qrCorrectionLevel = btn.getAttribute('data-level');
+                    generateQR();
+                });
+            });
+
+            // Logo Preset Selection
+            const logoButtons = document.querySelectorAll('.logo-btn');
+            logoButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    logoButtons.forEach(b => {
+                        b.classList.remove('border-brand-500', 'bg-brand-50', 'dark:bg-brand-950/30');
+                        b.classList.add('border-slate-200', 'dark:border-slate-700');
+                    });
+                    btn.classList.add('border-brand-500', 'bg-brand-50', 'dark:bg-brand-950/30');
+                    btn.classList.remove('border-slate-200', 'dark:border-slate-700');
+                    selectedLogo = btn.getAttribute('data-logo');
+                    generateQR();
+                });
+            });
+
+            // Dark Mode Toggle
+            const themeToggle = document.getElementById('themeToggle');
+            themeToggle.addEventListener('click', () => {
+                const html = document.documentElement;
+                if (html.classList.contains('dark')) {
+                    html.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    html.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                }
+            });
+
+            // Load saved theme
+            if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            }
+
+            // Download PNG
+            document.getElementById('downloadPng').addEventListener('click', () => {
+                const canvas = qrContainer.querySelector('canvas');
+                if (!canvas) {
+                    showToast('找不到二維碼畫布！', 'error');
+                    return;
+                }
+                const link = document.createElement('a');
+                link.download = 'qrcode.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                showToast('已成功下載 PNG 圖片！');
+            });
+
+            // Copy SVG/Code simulation action
+            document.getElementById('downloadSvg').addEventListener('click', () => {
+                const img = qrContainer.querySelector('img');
+                const canvas = qrContainer.querySelector('canvas');
+                let dataUri = canvas ? canvas.toDataURL() : (img ? img.src : '');
+                
+                if (dataUri) {
+                    const tempInput = document.createElement('textarea');
+                    tempInput.value = dataUri;
+                    document.body.appendChild(tempInput);
+                    tempInput.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(tempInput);
+                    showToast('已複製二維碼 Base64 資料至剪貼簿！');
+                } else {
+                    showToast('複製失敗，請稍後再試', 'error');
+                }
+            });
+        });
+
+        // Toast Notification Helper
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            toastMsg.textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

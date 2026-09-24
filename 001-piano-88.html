@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>88鍵滑鼠鋼琴</title>
+<style>
+    body {
+        background-color: #f0f0f0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        font-family: sans-serif;
+    }
+
+    .piano {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .controls {
+        margin-bottom: 20px;
+        background-color: #fff;
+        padding: 10px 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .piano-keys {
+        display: flex;
+        padding: 10px;
+        background-color: #222;
+        border-radius: 10px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+    }
+
+    .key {
+        border: 1px solid #000;
+        box-sizing: border-box;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .key.white {
+        background-color: white;
+        width: 60px;
+        height: 250px;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+    }
+
+    .key.white:active {
+        background-color: #eee;
+    }
+
+    .key.black {
+        background-color: black;
+        width: 38px;
+        height: 150px;
+        margin-left: -19px;
+        margin-right: -19px;
+        z-index: 2;
+        border-radius: 0 0 3px 3px;
+    }
+
+    .key.black:active {
+        background-color: #333;
+    }
+
+    .key-label {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        pointer-events: none;
+        font-size: 12px;
+    }
+
+    .key.black .key-label {
+        color: white;
+        font-size: 10px;
+    }
+
+</style>
+</head>
+<body>
+
+<div class="piano">
+    <div class="controls">
+        <label for="waveform">波形: </label>
+        <select id="waveform">
+            <option value="sine">正弦波 (Sine)</option>
+            <option value="square">方波 (Square)</option>
+            <option value="sawtooth" selected>鋸齒波 (Sawtooth)</option>
+            <option value="triangle">三角波 (Triangle)</option>
+        </select>
+        <label for="volume">音量: </label>
+        <input type="range" id="volume" min="0" max="1" step="0.01" value="0.5">
+    </div>
+    <div class="piano-keys" id="piano-keys"></div>
+</div>
+
+<script>
+    const pianoKeysContainer = document.getElementById('piano-keys');
+    const waveformSelector = document.getElementById('waveform');
+    const volumeControl = document.getElementById('volume');
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+    const noteFrequencies = {
+        'C': 16.35, 'C#': 17.32, 'D': 18.35, 'D#': 19.45, 'E': 20.60, 'F': 21.83,
+        'F#': 23.12, 'G': 24.50, 'G#': 25.96, 'A': 27.50, 'A#': 29.14, 'B': 30.87
+    };
+
+    const keyNotes = [
+        'A0', 'A#0', 'B0',
+        'C1', 'C#1', 'D1', 'D#1', 'E1', 'F1', 'F#1', 'G1', 'G#1', 'A1', 'A#1', 'B1',
+        'C2', 'C#2', 'D2', 'D#2', 'E2', 'F2', 'F#2', 'G2', 'G#2', 'A2', 'A#2', 'B2',
+        'C3', 'C#3', 'D3', 'D#3', 'E3', 'F3', 'F#3', 'G3', 'G#3', 'A3', 'A#3', 'B3',
+        'C4', 'C#4', 'D4', 'D#4', 'E4', 'F4', 'F#4', 'G4', 'G#4', 'A4', 'A#4', 'B4',
+        'C5', 'C#5', 'D5', 'D#5', 'E5', 'F5', 'F#5', 'G5', 'G#5', 'A5', 'A#5', 'B5',
+        'C6', 'C#6', 'D6', 'D#6', 'E6', 'F6', 'F#6', 'G6', 'G#6', 'A6', 'A#6', 'B6',
+        'C7', 'C#7', 'D7', 'D#7', 'E7', 'F7', 'F#7', 'G7', 'G#7', 'A7', 'A#7', 'B7',
+        'C8'
+    ];
+
+    function getFrequency(note) {
+        const noteName = note.slice(0, -1);
+        const octave = parseInt(note.slice(-1));
+        const baseFrequency = noteFrequencies[noteName];
+        if (note === 'A0' || note === 'A#0' || note === 'B0') {
+             return noteFrequencies[note.slice(0,-1)] * Math.pow(2, 0);
+        }
+        if (note === 'C8') {
+            return noteFrequencies['C'] * Math.pow(2, 8);
+        }
+        return baseFrequency * Math.pow(2, octave);
+    }
+
+    keyNotes.forEach(note => {
+        const keyElement = document.createElement('div');
+        const isBlackKey = note.includes('#');
+        keyElement.classList.add('key', isBlackKey ? 'black' : 'white');
+        keyElement.dataset.note = note;
+
+        const label = document.createElement('div');
+        label.classList.add('key-label');
+        label.textContent = note;
+        keyElement.appendChild(label);
+
+        pianoKeysContainer.appendChild(keyElement);
+    });
+
+    const gainNode = audioContext.createGain();
+    gainNode.connect(audioContext.destination);
+
+    function playNote(note) {
+        if (audioContext.state === 'suspended') {
+            audioContext.resume();
+        }
+
+        const frequency = getFrequency(note);
+        const oscillator = audioContext.createOscillator();
+        
+        oscillator.type = waveformSelector.value;
+        oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+        
+        gainNode.gain.cancelScheduledValues(audioContext.currentTime);
+        gainNode.gain.setValueAtTime(gainNode.gain.value, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(volumeControl.value, audioContext.currentTime + 0.01);
+
+        oscillator.connect(gainNode);
+        oscillator.start(audioContext.currentTime);
+
+        return oscillator;
+    }
+
+    let activeOscillators = {};
+
+    pianoKeysContainer.addEventListener('mousedown', e => {
+        if (e.target.classList.contains('key')) {
+            const note = e.target.dataset.note;
+            if (note && !activeOscillators[note]) {
+                activeOscillators[note] = playNote(note);
+            }
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        for (let note in activeOscillators) {
+            if (activeOscillators[note]) {
+                const oscillator = activeOscillators[note];
+                const releaseTime = audioContext.currentTime + 0.3; // Release time
+                gainNode.gain.cancelScheduledValues(audioContext.currentTime);
+                gainNode.gain.setValueAtTime(gainNode.gain.value, audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0, releaseTime);
+
+                oscillator.stop(releaseTime);
+                delete activeOscillators[note];
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

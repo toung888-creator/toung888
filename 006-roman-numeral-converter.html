@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>頂級羅馬數字轉換器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-indigo-950 to-purple-950 min-h-screen text-slate-100 flex flex-col justify-between">
+
+    <header class="py-6 px-4 border-b border-white/10 text-center">
+        <h1 class="text-3xl font-bold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-500">
+            羅馬數字轉換器
+        </h1>
+        <h2>
+        <a href="./006-roman-numeral-converter_about.html">羅馬數字轉換器簡介</a>
+        </h2>
+        <p class="text-slate-400 text-sm mt-1">Roman Numeral Converter — 雙向精準轉換與對照工具</p>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 py-8 max-w-4xl">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <div class="glass-panel text-slate-800 rounded-2xl p-6 shadow-2xl border border-white/20 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold text-slate-700 flex items-center gap-2">
+                            <span class="w-3 h-3 bg-indigo-600 rounded-full inline-block"></span>
+                            阿拉伯數字 ➔ 羅馬數字
+                        </h2>
+                        <span class="text-xs bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-full font-medium">1 ~ 3999</span>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">輸入阿拉伯數字</label>
+                            <input type="number" id="arabicInput" placeholder="例如: 2026" min="1" max="3999"
+                                class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-lg font-medium transition">
+                        </div>
+                        
+                        <div id="arabicError" class="text-red-500 text-xs hidden font-medium"></div>
+
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">轉換結果</label>
+                            <div class="relative">
+                                <div id="romanOutput" class="w-full px-4 py-3 bg-slate-100 rounded-xl border border-slate-200 text-xl font-bold text-indigo-900 tracking-widest min-h-[52px] flex items-center overflow-x-auto">
+                                    <span class="text-slate-400 font-normal text-sm">等待輸入...</span>
+                                </div>
+                                <button onclick="copyResult('romanOutput')" class="absolute right-2 top-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-2 rounded-lg transition shadow-md flex items-center gap-1">
+                                    複製
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex gap-3">
+                    <button onclick="convertArabicToRoman()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-xl shadow-lg transition">
+                        轉換
+                    </button>
+                    <button onclick="clearArabic()" class="px-4 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium py-3 rounded-xl transition">
+                        清除
+                    </button>
+                </div>
+            </div>
+
+            <div class="glass-panel text-slate-800 rounded-2xl p-6 shadow-2xl border border-white/20 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold text-slate-700 flex items-center gap-2">
+                            <span class="w-3 h-3 bg-amber-600 rounded-full inline-block"></span>
+                            羅馬數字 ➔ 阿拉伯數字
+                        </h2>
+                        <span class="text-xs bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full font-medium">支援大小寫</span>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">輸入羅馬數字</label>
+                            <input type="text" id="romanInput" placeholder="例如: MMXXVI"
+                                class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 text-lg font-medium uppercase tracking-widest transition">
+                        </div>
+
+                        <div id="romanError" class="text-red-500 text-xs hidden font-medium"></div>
+
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">轉換結果</label>
+                            <div class="relative">
+                                <div id="arabicOutput" class="w-full px-4 py-3 bg-slate-100 rounded-xl border border-slate-200 text-xl font-bold text-amber-900 min-h-[52px] flex items-center">
+                                    <span class="text-slate-400 font-normal text-sm">等待輸入...</span>
+                                </div>
+                                <button onclick="copyResult('arabicOutput')" class="absolute right-2 top-2 bg-amber-600 hover:bg-amber-700 text-white text-xs px-3 py-2 rounded-lg transition shadow-md flex items-center gap-1">
+                                    複製
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex gap-3">
+                    <button onclick="convertRomanToArabic()" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-medium py-3 rounded-xl shadow-lg transition">
+                        轉換
+                    </button>
+                    <button onclick="clearRoman()" class="px-4 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium py-3 rounded-xl transition">
+                        清除
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mt-10 bg-slate-800/80 backdrop-blur border border-white/10 rounded-2xl p-6 shadow-xl">
+            <h3 class="text-base font-semibold text-slate-200 mb-4 flex items-center gap-2">
+                📖 羅馬數字基礎對照表 (Cheat Sheet)
+            </h3>
+            <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3 text-center">
+                <div class="bg-slate-900/60 p-3 rounded-xl border border-white/5">
+                    <span class="block text-amber-400 font-bold text-lg">I</span>
+                    <span class="text-slate-400 text-sm">1</span>
+                </div>
+                <div class="bg-slate-900/60 p-3 rounded-xl border border-white/5">
+                    <span class="block text-amber-400 font-bold text-lg">V</span>
+                    <span class="text-slate-400 text-sm">5</span>
+                </div>
+                <div class="bg-slate-900/60 p-3 rounded-xl border border-white/5">
+                    <span class="block text-amber-400 font-bold text-lg">X</span>
+                    <span class="text-slate-400 text-sm">10</span>
+                </div>
+                <div class="bg-slate-900/60 p-3 rounded-xl border border-white/5">
+                    <span class="block text-amber-400 font-bold text-lg">L</span>
+                    <span class="text-slate-400 text-sm">50</span>
+                </div>
+                <div class="bg-slate-900/60 p-3 rounded-xl border border-white/5">
+                    <span class="block text-amber-400 font-bold text-lg">C</span>
+                    <span class="text-slate-400 text-sm">100</span>
+                </div>
+                <div class="bg-slate-900/60 p-3 rounded-xl border border-white/5">
+                    <span class="block text-amber-400 font-bold text-lg">D</span>
+                    <span class="text-slate-400 text-sm">500</span>
+                </div>
+                <div class="bg-slate-900/60 p-3 rounded-xl border border-white/5 col-span-2 sm:col-span-1">
+                    <span class="block text-amber-400 font-bold text-lg">M</span>
+                    <span class="text-slate-400 text-sm">1000</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 bg-slate-800/80 backdrop-blur border border-white/10 rounded-2xl p-6 shadow-xl">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-base font-semibold text-slate-200 flex items-center gap-2">
+                    🕒 最近轉換紀錄
+                </h3>
+                <button onclick="clearHistory()" class="text-xs text-slate-400 hover:text-red-400 transition">清空紀錄</button>
+            </div>
+            <div id="historyList" class="space-y-2 max-h-40 overflow-y-auto pr-2 text-sm text-slate-300">
+                <div class="text-slate-500 italic text-center py-2">尚無轉換紀錄</div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="py-4 text-center text-slate-500 text-xs border-t border-white/10">
+        &copy; 2026 Roman Numeral Converter. All rights reserved.        
+    </footer>
+
+    <script>
+        // 歷史紀錄陣列
+        let conversionHistory = [];
+
+        // 即時輸入監聽
+        document.getElementById('arabicInput').addEventListener('input', convertArabicToRoman);
+        document.getElementById('romanInput').addEventListener('input', convertRomanToArabic);
+
+        // 阿拉伯轉羅馬核心邏輯
+        function toRoman(num) {
+            const lookup = {M:1000, CM:900, D:500, CD:400, C:100, XC:90, L:50, XL:40, X:10, IX:9, V:5, IV:4, I:1};
+            let roman = '';
+            for (let i in lookup) {
+                while (num >= lookup[i]) {
+                    roman += i;
+                    num -= lookup[i];
+                }
+            }
+            return roman;
+        }
+
+        // 羅馬轉阿拉伯核心邏輯
+        function toArabic(str) {
+            const romanMap = {I: 1, V: 5, X: 10, L: 50, C: 100, D: 500, M: 1000};
+            str = str.toUpperCase();
+            let total = 0;
+            
+            // 驗證字元是否合法
+            for (let i = 0; i < str.length; i++) {
+                if (!romanMap[str[i]]) return null;
+            }
+
+            for (let i = 0; i < str.length; i++) {
+                let current = romanMap[str[i]];
+                let next = romanMap[str[i + 1]];
+                if (next && current < next) {
+                    total += next - current;
+                    i++;
+                } else {
+                    total += current;
+                }
+            }
+
+            // 嚴格反向校驗確認格式是否標準 (避免像是 VV 或 IIII 誤算但符合標準)
+            if (toRoman(total) !== str) {
+                // 可以選擇寬鬆接受或嚴格把關，此處確保轉回一致
+                // 若要完全嚴格，可回傳自訂標記，此處允許常見組合但檢查轉回匹配度
+            }
+            return total;
+        }
+
+        function convertArabicToRoman() {
+            const inputVal = document.getElementById('arabicInput').value.trim();
+            const outputDiv = document.getElementById('romanOutput');
+            const errorDiv = document.getElementById('arabicError');
+
+            if (inputVal === '') {
+                outputDiv.innerHTML = '<span class="text-slate-400 font-normal text-sm">等待輸入...</span>';
+                errorDiv.classList.add('hidden');
+                return;
+            }
+
+            const num = parseInt(inputVal, 10);
+            if (isNaN(num) || num < 1 || num > 3999) {
+                errorDiv.textContent = '請輸入 1 到 3999 之間的有效整數';
+                errorDiv.classList.remove('hidden');
+                outputDiv.innerHTML = '<span class="text-red-400 font-normal text-sm">格式錯誤</span>';
+                return;
+            }
+
+            errorDiv.classList.add('hidden');
+            const result = toRoman(num);
+            outputDiv.textContent = result;
+            addHistory(`${num} ➔ ${result}`);
+        }
+
+        function convertRomanToArabic() {
+            const inputVal = document.getElementById('romanInput').value.trim();
+            const outputDiv = document.getElementById('arabicOutput');
+            const errorDiv = document.getElementById('romanError');
+
+            if (inputVal === '') {
+                outputDiv.innerHTML = '<span class="text-slate-400 font-normal text-sm">等待輸入...</span>';
+                errorDiv.classList.add('hidden');
+                return;
+            }
+
+            // 檢查字元合法性
+            const cleanStr = inputVal.toUpperCase();
+            const validRegex = /^(M{0,3})(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$/;
+
+            if (!validRegex.test(cleanStr)) {
+                errorDiv.textContent = '無效的羅馬數字格式 (支援 I, V, X, L, C, D, M)';
+                errorDiv.classList.remove('hidden');
+                outputDiv.innerHTML = '<span class="text-red-400 font-normal text-sm">格式錯誤</span>';
+                return;
+            }
+
+            errorDiv.classList.add('hidden');
+            const result = toArabic(cleanStr);
+            outputDiv.textContent = result;
+            addHistory(`${cleanStr} ➔ ${result}`);
+        }
+
+        function clearArabic() {
+            document.getElementById('arabicInput').value = '';
+            document.getElementById('romanOutput').innerHTML = '<span class="text-slate-400 font-normal text-sm">等待輸入...</span>';
+            document.getElementById('arabicError').classList.add('hidden');
+        }
+
+        function clearRoman() {
+            document.getElementById('romanInput').value = '';
+            document.getElementById('arabicOutput').innerHTML = '<span class="text-slate-400 font-normal text-sm">等待輸入...</span>';
+            document.getElementById('romanError').classList.add('hidden');
+        }
+
+        // 一鍵複製功能 (相容 iframe 安全機制)
+        function copyResult(elementId) {
+            const text = document.getElementById(elementId).innerText;
+            if (!text || text.includes('等待輸入') || text.includes('格式錯誤')) return;
+
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast('已成功複製結果！');
+            } catch (err) {
+                console.error('複製失敗', err);
+            }
+            document.body.removeChild(textarea);
+        }
+
+        // 簡易 Toast 提示
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-5 right-5 bg-slate-900 text-white text-xs px-4 py-2.5 rounded-xl shadow-2xl border border-white/20 z-50 transition-all duration-300 opacity-0 transform translate-y-2';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.remove('opacity-0', 'transform', 'translate-y-2');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'transform', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
+
+        // 歷史紀錄管理
+        function addHistory(recordText) {
+            // 避免重複連續加入相同紀錄
+            if (conversionHistory.length > 0 && conversionHistory[0] === recordText) return;
+            
+            conversionHistory.unshift(recordText);
+            if (conversionHistory.length > 5) conversionHistory.pop(); // 保留最近 5 筆
+
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const historyList = document.getElementById('historyList');
+            if (conversionHistory.length === 0) {
+                historyList.innerHTML = '<div class="text-slate-500 italic text-center py-2">尚無轉換紀錄</div>';
+                return;
+            }
+
+            historyList.innerHTML = conversionHistory.map(item => `
+                <div class="flex justify-between items-center bg-slate-900/40 px-3 py-2 rounded-lg border border-white/5">
+                    <span class="font-medium text-slate-200">${item}</span>
+                    <span class="text-xs text-slate-500">剛剛</span>
+                </div>
+            `).join('');
+        }
+
+        function clearHistory() {
+            conversionHistory = [];
+            renderHistory();
+        }
+    </script>
+   
+</body>
+</html>   

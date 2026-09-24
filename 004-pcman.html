@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>經典小精靈 (Pac-Man) 小遊戲</title>
+    <style>
+        body {
+            background-color: #111;
+            color: white;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        h1 {
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px #ffee00;
+        }
+        #score-board {
+            font-size: 24px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        canvas {
+            border: 4px solid #0000ff;
+            box-shadow: 0 0 20px #0000ff;
+            background-color: black;
+        }
+        .instructions {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #aaa;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>PAC-MAN 小精靈</h1>
+    <div id="score-board">分數: <span id="score">0</span></div>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <div class="instructions">
+        使用鍵盤的 <b>↑ ↓ ← →</b> 方向鍵來控制小精靈移動。<br>
+        躲避紅色的幽靈，吃光畫面上所有的黃色豆豆吧！
+    </div>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const scoreElement = document.getElementById("score");
+
+        const tileSize = 20;
+        let score = 0;
+        let gameOver = false;
+
+        // 地圖矩陣：1 = 牆壁, 0 = 豆豆, 2 = 空地
+        const map = [
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,1],
+            [1,0,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,1,0,1],
+            [1,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1],
+            [1,0,1,0,1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,1,1,0,1,1,1,1,2,2,1,1,1,1,0,1,1,0,1],
+            [1,0,0,0,0,1,2,2,2,2,2,2,2,2,1,0,0,0,0,1],
+            [1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1],
+            [2,2,2,1,0,1,2,2,2,2,2,2,2,2,1,0,1,2,2,2],
+            [1,1,1,1,0,1,2,1,1,2,2,1,1,2,1,0,1,1,1,1],
+            [1,0,0,0,0,0,2,1,2,2,2,2,1,2,0,0,0,0,0,1],
+            [1,0,1,1,1,1,2,1,1,1,1,1,1,2,1,1,1,1,0,1],
+            [1,0,0,0,0,1,2,2,2,2,2,2,2,2,1,0,0,0,0,1],
+            [1,1,1,1,0,1,1,1,1,2,2,1,1,1,1,0,1,1,1,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1],
+            [1,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,1],
+            [1,1,0,1,1,1,1,1,0,1,0,1,1,1,1,1,1,0,1,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+        ];
+
+        // 小精靈設定
+        let pacman = {
+            x: 9, // 網格座標
+            y: 11,
+            dx: 0, // 移動方向
+            dy: 0,
+            nextDx: 0, // 預約的移動方向
+            nextDy: 0,
+            angle: 0 // 嘴巴朝向
+        };
+
+        // 幽靈設定 (目前先做一隻，可以自行複製增加)
+        let ghost = {
+            x: 9,
+            y: 8,
+            dx: 1,
+            dy: 0,
+            color: "red"
+        };
+
+        // 監聽鍵盤事件
+        window.addEventListener("keydown", e => {
+            switch(e.key) {
+                case "ArrowUp":    pacman.nextDx = 0;  pacman.nextDy = -1; break;
+                case "ArrowDown":  pacman.nextDx = 0;  pacman.nextDy = 1;  break;
+                case "ArrowLeft":  pacman.nextDx = -1; pacman.nextDy = 0;  break;
+                case "ArrowRight": pacman.nextDx = 1;  pacman.nextDy = 0;  break;
+            }
+        });
+
+        // 檢查指定位置是否為牆壁
+        function isWall(x, y) {
+            // 處理地圖左右穿透邊界
+            if (x < 0 || x >= map[0].length) return false;
+            return map[y] && map[y][x] === 1;
+        }
+
+        // 遊戲核心邏輯更新
+        function update() {
+            if (gameOver) return;
+
+            // --- 小精靈移動邏輯 ---
+            // 嘗試轉向玩家預約的方向
+            if (!isWall(pacman.x + pacman.nextDx, pacman.y + pacman.nextDy)) {
+                pacman.dx = pacman.nextDx;
+                pacman.dy = pacman.nextDy;
+            }
+
+            // 根據目前方向前進
+            if (!isWall(pacman.x + pacman.dx, pacman.y + pacman.dy)) {
+                pacman.x += pacman.dx;
+                pacman.y += pacman.dy;
+            }
+
+            // 地圖左右穿透效果
+            if (pacman.x < 0) pacman.x = map[0].length - 1;
+            if (pacman.x >= map[0].length) pacman.x = 0;
+
+            // 吃豆豆
+            if (map[pacman.y][pacman.x] === 0) {
+                map[pacman.y][pacman.x] = 2; // 變成空地
+                score += 10;
+                scoreElement.innerText = score;
+            }
+
+            // --- 幽靈移動邏輯 (簡單的AI：遇到牆壁隨機轉彎) ---
+            let possibleMoves = [];
+            const dirs = [{x:0, y:-1}, {x:0, y:1}, {x:-1, y:0}, {x:1, y:0}];
+            
+            dirs.forEach(d => {
+                // 不走回頭路，且前方不是牆壁
+                if (!isWall(ghost.x + d.x, ghost.y + d.y) && !(d.x === -ghost.dx && d.y === -ghost.dy)) {
+                    possibleMoves.push(d);
+                }
+            });
+
+            // 如果沒死路，隨機選一個方向；如果死路，允許走回頭路
+            if (possibleMoves.length > 0) {
+                let move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+                ghost.dx = move.x;
+                ghost.dy = move.y;
+            } else {
+                ghost.dx = -ghost.dx;
+                ghost.dy = -ghost.dy;
+            }
+
+            ghost.x += ghost.dx;
+            ghost.y += ghost.dy;
+
+            // --- 碰撞偵測 (小精靈與幽靈) ---
+            if (pacman.x === ghost.x && pacman.y === ghost.y) {
+                gameOver = true;
+                alert("遊戲結束！ 你的得分是: " + score);
+                location.reload(); // 重新整理網頁重來
+            }
+
+            // 檢查是否贏了 (吃光所有豆豆)
+            let win = true;
+            for(let r=0; r<map.length; r++) {
+                if(map[r].includes(0)) { win = false; break; }
+            }
+            if(win) {
+                gameOver = true;
+                alert("恭喜通關！你吃光了所有豆豆！ 分數: " + score);
+                location.reload();
+            }
+        }
+
+        // 畫面繪製
+        function draw() {
+            // 清空畫布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 畫地圖與豆豆
+            for (let r = 0; r < map.length; r++) {
+                for (let c = 0; c < map[r].length; c++) {
+                    if (map[r][c] === 1) {
+                        // 畫藍色牆壁
+                        ctx.fillStyle = "#0000bf";
+                        ctx.fillRect(c * tileSize, r * tileSize, tileSize, tileSize);
+                    } else if (map[r][c] === 0) {
+                        // 畫黃色小豆豆
+                        ctx.fillStyle = "#ffb8ae";
+                        ctx.beginPath();
+                        ctx.arc(c * tileSize + tileSize/2, r * tileSize + tileSize/2, 3, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+            }
+
+            // 畫小精靈 (Pac-Man)
+            ctx.fillStyle = "#ffff00";
+            ctx.beginPath();
+            let centerX = pacman.x * tileSize + tileSize / 2;
+            let centerY = pacman.y * tileSize + tileSize / 2;
+            let radius = tileSize / 2 - 1;
+            
+            // 依據移動方向旋轉嘴巴角度
+            let startAngle = 0.2 * Math.PI;
+            let endAngle = 1.8 * Math.PI;
+            if (pacman.dx === -1) { startAngle = 1.2 * Math.PI; endAngle = 0.8 * Math.PI; }
+            else if (pacman.dy === -1) { startAngle = 1.7 * Math.PI; endAngle = 1.3 * Math.PI; }
+            else if (pacman.dy === 1) { startAngle = 0.7 * Math.PI; endAngle = 0.3 * Math.PI; }
+
+            ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+            ctx.lineTo(centerX, centerY);
+            ctx.fill();
+
+            // 畫幽靈
+            ctx.fillStyle = ghost.color;
+            ctx.beginPath();
+            let gx = ghost.x * tileSize + tileSize / 2;
+            let gy = ghost.y * tileSize + tileSize / 2;
+            ctx.arc(gx, gy - 2, radius, Math.PI, 0, false); // 頭部圓弧
+            ctx.lineTo(gx + radius, gy + radius); // 右身
+            ctx.lineTo(gx - radius, gy + radius); // 左身
+            ctx.closePath();
+            ctx.fill();
+            
+            // 幽靈眼睛
+            ctx.fillStyle = "white";
+            ctx.beginPath();
+            ctx.arc(gx - 3, gy - 2, 3, 0, Math.PI*2);
+            ctx.arc(gx + 3, gy - 2, 3, 0, Math.PI*2);
+            ctx.fill();
+        }
+
+        // 遊戲主迴圈 (控制遊戲節奏)
+        function gameLoop() {
+            update();
+            draw();
+            setTimeout(gameLoop, 200); // 每 200 毫秒跑一格 (可調整此數值改變遊戲速度)
+        }
+
+        // 啟動遊戲
+        gameLoop();
+    </script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-mantine-color-scheme="light" style="">
+<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<body>
+<h2>羅馬數字轉換器簡介</h2>
+<p>羅馬數字（Roman Numerals）是古羅馬人發展出的記數系統，至今仍廣泛應用於鐘錶錶盤、電影年份標示、書籍章節編號、奧運會屆次以及各種正式文件中。這個工具提供阿拉伯數字與羅馬數字之間的快速雙向轉換，並附有分解說明與對照表，讓你輕鬆理解每一個符號的含義。</p>
+<h2>羅馬數字的歷史與由來</h2>
+<p>羅馬數字起源於古羅馬，最早是以計數棒（tally sticks）的刻痕為基礎演變而來。I 代表一根手指，V 代表一隻手的形狀，X 則是兩個 V 合併而成。這套系統在歐洲被廣泛使用長達千年，直到 13 世紀阿拉伯數字（1、2、3…）傳入歐洲後才逐漸被取代。</p>
+<p>儘管如此，羅馬數字至今仍未消失，在以下場合依然常見：</p>
+<ul>
+<li><strong>鐘錶與時鐘</strong>：許多高級腕錶和古典時鐘的錶盤使用羅馬數字</li>
+<li><strong>電影年份</strong>：英美電影製作公司在片尾字幕常以羅馬數字標示版權年份（如 MMXXIV = 2024）</li>
+<li><strong>書籍章節</strong>：序言、前言（Introduction）的頁碼通常用小寫羅馬數字（i, ii, iii...）</li>
+<li><strong>奧運與世界盃</strong>：「第 XXXIII 屆夏季奧運會」這類說法在國際場合相當普遍</li>
+<li><strong>君主與教宗名號</strong>：英王查理三世（Charles III）、教宗若望保祿二世（John Paul II）</li>
+<li><strong>建築物落成年份</strong>：歐洲許多建築物的銘牌以羅馬數字標示興建年份</li>
+</ul>
+<h2>七個基本符號</h2>
+<p>羅馬數字系統只有七個基本符號：</p>
+<table><thead><tr><th>符號</th><th>數值</th><th>記憶技巧</th></tr></thead><tbody><tr><td>I</td><td>1</td><td>一根手指</td></tr><tr><td>V</td><td>5</td><td>張開的手掌（五根手指的形狀）</td></tr><tr><td>X</td><td>10</td><td>兩個 V 交叉</td></tr><tr><td>L</td><td>50</td><td>—</td></tr><tr><td>C</td><td>100</td><td>拉丁文 Centum（百）的首字母</td></tr><tr><td>D</td><td>500</td><td>—</td></tr><tr><td>M</td><td>1000</td><td>拉丁文 Mille（千）的首字母</td></tr></tbody></table>
+<h2>減法原則詳解</h2>
+<p>羅馬數字最重要的書寫規則就是<strong>減法原則</strong>（Subtractive Notation）：當一個小值符號放在大值符號<strong>左側</strong>時，表示用大值<strong>減去</strong>小值；放在<strong>右側</strong>則是相加。這個規則只允許以下六種組合：</p>
+<table><thead><tr><th>組合</th><th>計算</th><th>結果</th></tr></thead><tbody><tr><td>IV</td><td>5 − 1</td><td>4</td></tr><tr><td>IX</td><td>10 − 1</td><td>9</td></tr><tr><td>XL</td><td>50 − 10</td><td>40</td></tr><tr><td>XC</td><td>100 − 10</td><td>90</td></tr><tr><td>CD</td><td>500 − 100</td><td>400</td></tr><tr><td>CM</td><td>1000 − 100</td><td>900</td></tr></tbody></table>
+<p>例如，<strong>1999</strong> 的寫法是：</p>
+<blockquote>
+<p>1000 + 900 + 90 + 9 = <strong>M</strong> + <strong>CM</strong> + <strong>XC</strong> + <strong>IX</strong> = <strong>MCMXCIX</strong></p>
+</blockquote>
+<h2>書寫規則</h2>
+<ol>
+<li><strong>同一符號最多連寫三次</strong>：III（3）合法，IIII（4）不合法，應寫作 IV</li>
+<li><strong>V、L、D 不可重複</strong>：VV 不合法，應寫作 X</li>
+<li><strong>減法組合有限制</strong>：只有上方表格中的六種減法組合是標準寫法</li>
+<li><strong>有效範圍為 1 至 3999</strong>：4000 以上的傳統寫法需要特殊符號（vinculum），本工具不支援</li>
+</ol>
+<h2>常用年份對照</h2>
+<table><thead><tr><th>年份</th><th>羅馬數字</th></tr></thead><tbody><tr><td>2000</td><td>MM</td></tr><tr><td>2010</td><td>MMX</td></tr><tr><td>2020</td><td>MMXX</td></tr><tr><td>2024</td><td>MMXXIV</td></tr><tr><td>2025</td><td>MMXXV</td></tr><tr><td>2026</td><td>MMXXVI</td></tr><tr><td>2030</td><td>MMXXX</td></tr><tr><td>2050</td><td>MML</td></tr><tr><td>2100</td><td>MMC</td></tr></tbody></table>
+<h2>常見問題</h2>
+<h3>羅馬數字有沒有「0」？</h3>
+<p>沒有。這是羅馬數字系統的重要缺點之一——它沒有「零」的概念，這也是為什麼它最終被阿拉伯數字取代。古羅馬人計數從 1 開始，無法表示「無」這個概念。</p>
+<h3>為什麼只支援 1 至 3999？</h3>
+<p>傳統標準羅馬數字的最大值為 3999（MMMCMXCIX）。超過這個數值需要使用「vinculum」（在數字上方加橫線，表示乘以 1000），這個符號在數位環境中難以標準化呈現，因此大多數轉換工具都以 3999 為上限。</p>
+<h3>鐘錶為什麼用 IIII 而不是 IV？</h3>
+<p>這是一個有趣的歷史慣例！許多傳統鐘錶的確使用 IIII 而非 IV 來表示 4，原因眾說紛紜，包括：視覺對稱（和錶盤右側的 VIII 對應）、鑄造模具的便利，以及對稱美觀等。這是羅馬數字在實際應用中少數不遵守標準規則的例外。</p>
+<h3>電影片尾的年份為何使用羅馬數字？</h3>
+<p>這源於好萊塢早期的慣例。據說最初目的是讓觀眾不易注意到電影的確切製作年份，避免作品顯得老舊，同時也為電視重播爭取更長的生命週期。如今這已成為一種傳統，即便觀眾大多能辨識羅馬數字。</p>
+<ul>
+</body>
+</html>
