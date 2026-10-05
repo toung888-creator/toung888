@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>關於我 - 個人履歷</title>
+    <!-- 引入 Tailwind CSS 快速打造美觀介面 -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- 引入 Google Fonts (Noto Sans Traditional Chinese) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col justify-between">
+
+    <!-- 主容器 -->
+    <main class="max-w-3xl mx-auto px-6 py-12 md:py-20 w-full">
+        
+        <!-- 個人頭像與基本資料 -->
+        <section class="flex flex-col md:flex-row items-center gap-8 mb-12">
+            <div class="w-32 h-32 md:w-40 md:h-40 rounded-full bg-gradient-to-tr from-indigo-500 to-teal-400 p-1 shadow-lg shrink-0">
+                <!-- 替換成您的真實頭像網址 -->
+                <!-- <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80" alt="個人頭像" class="w-full h-full object-cover rounded-full bg-white"> -->                
+                <img src="./andrewtoung-01.png" alt="個人頭像" class="w-full h-full object-cover rounded-full bg-white">
+            </div>
+            <div class="text-center md:text-left">
+                <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-slate-900 mb-2">童老大 <span class="text-lg font-normal text-indigo-600 block md:inline md:ml-2">Andrew Toung</span></h1>
+                <p class="text-slate-600 font-medium mb-4">軟體工程師 / 程式設計愛好者 / 終身學習者</p>
+                <div class="flex flex-wrap justify-center md:justify-start gap-3">
+                    <a href="mailto:toung888@gmail.com" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-full shadow-sm hover:bg-indigo-700 transition">與我聯絡</a>
+                    <a href="./000-projects.html" class="px-4 py-2 bg-white text-slate-700 border border-slate-300 text-sm font-medium rounded-full shadow-sm hover:bg-slate-50 transition">看作品集</a>
+                </div>
+            </div>
+        </section>
+
+        <hr class="border-slate-200 mb-12">
+
+        <!-- 關於我簡介 -->
+        <section class="mb-12">
+            <h2 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <span class="w-2 h-6 bg-indigo-600 rounded-full"></span> 關於我
+            </h2>
+            <p class="text-slate-600 leading-relaxed bg-white p-6 rounded-2xl shadow-xs border border-slate-100">
+                嗨！我是一名熱情且具備解決問題能力的開發者。擁有多年程式開發與專案經驗，熱衷於將複雜的需求轉化為直覺、流暢且美觀的數位體驗。平時喜歡探索新技術、閱讀，並樂於與人交流和分享經驗。
+            </p>
+        </section>
+
+        <!-- 專業技能 -->
+        <section class="mb-12">
+            <h2 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <span class="w-2 h-6 bg-indigo-600 rounded-full"></span> 專業技能
+            </h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-100">
+                    <h3 class="font-semibold text-slate-900 mb-1">前端開發</h3>
+                    <p class="text-sm text-slate-500">HTML / CSS / JavaScript </p>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-100">
+                    <h3 class="font-semibold text-slate-900 mb-1">後端技術</h3>
+                    <p class="text-sm text-slate-500">Informix database / Delphi </p>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-100">
+                    <h3 class="font-semibold text-slate-900 mb-1">工具與協作</h3>
+                    <p class="text-sm text-slate-500">GitHub</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 個人經歷 / 工作經歷 -->
+        <section class="mb-12" id="projects">
+            <h2 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <span class="w-2 h-6 bg-indigo-600 rounded-full"></span> 工作經歷
+            </h2>
+            <div class="space-y-4">
+                <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-100">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2">
+                        <h3 class="font-bold text-slate-900">資深軟體工程師 <span class="text-indigo-600 font-normal">@ 某某五星級觀光酒店</span></h3>
+                        <span class="text-xs text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full w-fit mt-1 sm:mt-0">2003 - 現今</span>
+                    </div>
+                    <p class="text-sm text-slate-600">負責企業級視窗應用程式開發，作業流程E化。 </p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-100">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2">
+                        <h3 class="font-bold text-slate-900">資深軟體工程師 <span class="text-indigo-600 font-normal">@ 某某文化科技公司</span></h3>
+                        <span class="text-xs text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full w-fit mt-1 sm:mt-0">1992 - 2003</span>
+                    </div>
+                    <p class="text-sm text-slate-600">獨立完成圖書館管理系統，銷售各級學校及公立圖書館。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 社群連結 -->
+        <section>
+            <h2 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <span class="w-2 h-6 bg-indigo-600 rounded-full"></span> 找到我
+            </h2>
+            <div class="flex gap-4">
+                <a href="https://toung888-creator.github.io/toung888/" target="_blank" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition flex items-center gap-1">
+                    GitHub
+                </a>
+                <a href="https://www.facebook.com/andrew.toung" target="_blank" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition flex items-center gap-1">
+                    FaceBook
+                </a>                
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="text-center py-6 text-xs text-slate-400 border-t border-slate-200">
+        <p>&copy; 2026 Andrew Toung. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

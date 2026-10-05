@@ -6,10 +6,12 @@
     <title>童老大的AI世界</title>
     <!-- 引入 FontAwesome 圖示 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css">       
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>    
 </head>
-<body>
 
+<body>
     <!-- 1. 頂部導覽列（5個核心連結） -->
     <header class="navbar">
         <div class="nav-container">
@@ -17,11 +19,11 @@
 
             <nav class="nav-menu" id="navMenu">
                 <ul>
-                    <li><a href="#" class="active">首頁</a></li>
-                    <li><a href="#">關於童老大</a></li>
-                    <li><a href="#">AI生成展示專區</a></li>
+                    <li><a href="./index.html" class="active">首頁</a></li>
+                    <li><a href="./about_me.html">關於童老大</a></li>
+                    <li><a href="./000-projects.html">AI生成展示專區</a></li>
                     <li><a href="#">最新消息</a></li>
-                    <li><a href="#">聯絡我們</a></li>
+                    <li><a href="#">聯絡我</a></li>
                 </ul>
             </nav>
 
@@ -35,89 +37,12 @@
             </div>
         </div>
     </header>
-
-    <!-- 2. 頁面主要內容（內文由上而下加入 5 個快速導覽連結） -->
+ 
     <main class="main-content">
         <div class="hero-section">
-            <h1>歡迎來到童老大的AI世界</h1>
+            <h1><B>歡迎來到童老大的AI世界</B></h1>
             <p>探索AI的無限可能，讓我們的生活更加美好，並充滿樂趣。</p>
-        </div>
-
-        <!-- 內文由上而下排列的 5 個核心導覽連結 -->
-        <div class="content-links-container">
-            <h3>AI生成展示專區</h3>
-            <ul class="content-links-list">
-                <li>
-                    <a href="./001-piano-88.html">
-                        <i class="fa-solid fa-rocket"></i>
-                        <span>88鍵標準鋼琴</span>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-                </li>
-                <li>
-                    <a href="./002-dailytable.html">
-                        <i class="fa-solid fa-lightbulb"></i>
-                        <span>台中日常儀表板</span>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-                </li>
-                <li>
-                    <a href="./003-snake.html">
-                        <i class="fa-solid fa-chart-line"></i>
-                        <span>貪吃蛇</span>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-                </li>
-                <li>
-                    <a href="./004-pcman.html">
-                        <i class="fa-solid fa-tags"></i>
-                        <span>小精靈</span>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-                </li>
-                <li>
-                    <a href="./005-qr_code.html">
-                        <i class="fa-solid fa-headset"></i>
-                        <span>二維碼（QR Code）產生器</span>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-                </li>
-                <li>
-                    <a href="./006-roman-numeral-converter.html">
-                        <i class="fa-solid fa-rocket"></i>
-                        <span>羅馬數字轉換器</span>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-                </li>
-                 <li>
-                    <a href="./007-.html">
-                        <i class="fa-solid fa-lightbulb"></i>
-                        <span>007</span>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-                </li>
-                <li>
-                    <a href="./003-snake.html">
-                        <i class="fa-solid fa-chart-line"></i>
-                        <span>008</span>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-                </li>
-                <li>
-                    <a href="./004-pcman.html">
-                        <i class="fa-solid fa-tags"></i>
-                        <span>009</span>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-                </li>
-                <li>
-                    <a href="./005-qr_code.html">
-                        <i class="fa-solid fa-headset"></i>
-                        <span>010</span>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-                </li>
-            </ul>
+            <img src="./index_logo.jpg" alt="首頁Logo圖">    
         </div>
     </main>
 
@@ -146,7 +71,7 @@
             </div>
 
             <div class="footer-col">
-                <h3>聯絡我們</h3>
+                <h3>聯絡我</h3>
                 <p><i class="fa-solid fa-envelope"></i> toung888@gmail.com</p>
                 <p><i class="fa-solid fa-phone"></i> (04) 2324-6039</p>
             </div>

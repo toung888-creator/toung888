@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>精美響應式橫向輪播圖片網頁</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom smooth transition for carousel slides */
+        .carousel-track {
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+    <header class="w-full py-6 px-6 md:px-12 flex justify-between items-center backdrop-blur-md bg-white/5 border-b border-white/10 sticky top-0 z-40">
+        <div class="flex items-center space-x-3">
+            <div class="bg-indigo-600 p-2.5 rounded-xl shadow-lg shadow-indigo-500/30">
+                <i class="fa-solid fa-images text-xl text-white"></i>
+            </div>
+            <h1 class="text-xl md:text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-indigo-200 to-indigo-400 bg-clip-text text-transparent">
+                Immersive Gallery
+            </h1>
+        </div>
+        <div class="hidden sm:flex items-center space-x-4 text-sm text-slate-300">
+            <span class="flex items-center gap-1.5"><i class="fa-solid fa-circle text-emerald-400 text-xs animate-pulse"></i> 自動輪播中</span>
+        </div>
+    </header>
+
+    <main class="flex-grow flex flex-col items-center justify-center px-4 py-12 md:py-16 max-w-7xl mx-auto w-full">
+        <div class="text-center mb-10 max-w-2xl">
+            <h2 class="text-3xl md:text-5xl font-extrabold tracking-tight mb-4 bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300 bg-clip-text text-transparent">
+                探索精選視覺旅程
+            </h2>
+            <p class="text-slate-400 text-sm md:text-base">
+                沉浸於高畫質的攝影世界。支援自動播放、手動導航以及點擊圖片放大預覽。
+            </p>
+        </div>
+
+        <!-- Carousel Wrapper with Glassmorphism -->
+        <div id="carousel-container" class="relative w-full max-w-5xl rounded-3xl overflow-hidden shadow-2xl shadow-indigo-950/50 border border-white/10 bg-slate-900/60 backdrop-blur-xl group">
+            
+            <!-- Slides Track -->
+            <div class="carousel-track flex w-full h-[380px] md:h-[520px]" id="carousel-track">
+                <!-- Slide 1 -->
+                <div class="carousel-slide min-w-full h-full relative cursor-pointer group/slide" onclick="openLightbox(0)">
+                    <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80" 
+                         onerror="this.src='https://placehold.co/1600x900/1e293b/cbd5e1?text=Image+1'"
+                         alt="熱帶海灘" class="w-full h-full object-cover transition-transform duration-700 group-hover/slide:scale-105">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent flex flex-col justify-end p-6 md:p-10">
+                        <span class="bg-indigo-600/80 backdrop-blur-md text-white text-xs font-semibold px-3 py-1 rounded-full w-max mb-2">自然風光</span>
+                        <h3 class="text-2xl md:text-3xl font-bold text-white mb-2">蔚藍海岸與金色沙灘</h3>
+                        <p class="text-slate-300 text-sm md:text-base line-clamp-2 max-w-xl">享受陽光灑落的海濱假期，聆聽海浪拍打岸邊的療癒節奏，遠離城市喧囂。</p>
+                    </div>
+                </div>
+
+                <!-- Slide 2 -->
+                <div class="carousel-slide min-w-full h-full relative cursor-pointer group/slide" onclick="openLightbox(1)">
+                    <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80" 
+                         onerror="this.src='https://placehold.co/1600x900/1e293b/cbd5e1?text=Image+2'"
+                         alt="壯麗山脈" class="w-full h-full object-cover transition-transform duration-700 group-hover/slide:scale-105">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent flex flex-col justify-end p-6 md:p-10">
+                        <span class="bg-indigo-600/80 backdrop-blur-md text-white text-xs font-semibold px-3 py-1 rounded-full w-max mb-2">冒險探險</span>
+                        <h3 class="text-2xl md:text-3xl font-bold text-white mb-2">雲霧繚繞的群山之巔</h3>
+                        <p class="text-slate-300 text-sm md:text-base line-clamp-2 max-w-xl">挑戰自我極限，登高望遠，欣賞大自然鬼斧神工的壯麗山景與遼闊視野。</p>
+                    </div>
+                </div>
+
+                <!-- Slide 3 -->
+                <div class="carousel-slide min-w-full h-full relative cursor-pointer group/slide" onclick="openLightbox(2)">
+                    <img src="https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=1600&q=80" 
+                         onerror="this.src='https://placehold.co/1600x900/1e293b/cbd5e1?text=Image+3'"
+                         alt="現代都市" class="w-full h-full object-cover transition-transform duration-700 group-hover/slide:scale-105">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent flex flex-col justify-end p-6 md:p-10">
+                        <span class="bg-indigo-600/80 backdrop-blur-md text-white text-xs font-semibold px-3 py-1 rounded-full w-max mb-2">城市夜景</span>
+                        <h3 class="text-2xl md:text-3xl font-bold text-white mb-2">霓虹閃爍的繁華都會</h3>
+                        <p class="text-slate-300 text-sm md:text-base line-clamp-2 max-w-xl">夜幕低垂下的摩天大樓與車水馬龍，展現出人類文明的現代科技與藝術美感。</p>
+                    </div>
+                </div>
+
+                <!-- Slide 4 -->
+                <div class="carousel-slide min-w-full h-full relative cursor-pointer group/slide" onclick="openLightbox(3)">
+                    <img src="https://images.unsplash.com/photo-1426604966848-d7adac902bff?auto=format&fit=crop&w=1600&q=80" 
+                         onerror="this.src='https://placehold.co/1600x900/1e293b/cbd5e1?text=Image+4'"
+                         alt="神祕森林" class="w-full h-full object-cover transition-transform duration-700 group-hover/slide:scale-105">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent flex flex-col justify-end p-6 md:p-10">
+                        <span class="bg-indigo-600/80 backdrop-blur-md text-white text-xs font-semibold px-3 py-1 rounded-full w-max mb-2">生態森林</span>
+                        <h3 class="text-2xl md:text-3xl font-bold text-white mb-2">綠意盎然的原始密林</h3>
+                        <p class="text-slate-300 text-sm md:text-base line-clamp-2 max-w-xl">陽光穿透高大樹冠灑落青苔地表，深呼吸感受大自然最純粹的芬多精與平靜。</p>
+                    </div>
+                </div>
+
+                <!-- Slide 5 -->
+                <div class="carousel-slide min-w-full h-full relative cursor-pointer group/slide" onclick="openLightbox(4)">
+                    <img src="https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1600&q=80" 
+                         onerror="this.src='https://placehold.co/1600x900/1e293b/cbd5e1?text=Image+5'"
+                         alt="星空宇宙" class="w-full h-full object-cover transition-transform duration-700 group-hover/slide:scale-105">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent flex flex-col justify-end p-6 md:p-10">
+                        <span class="bg-indigo-600/80 backdrop-blur-md text-white text-xs font-semibold px-3 py-1 rounded-full w-max mb-2">天文星空</span>
+                        <h3 class="text-2xl md:text-3xl font-bold text-white mb-2">浩瀚無垠的璀璨銀河</h3>
+                        <p class="text-slate-300 text-sm md:text-base line-clamp-2 max-w-xl">繁星點點的夜空引人無限遐思，探索宇宙奧秘，感受自身的渺小與偉大。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons (Prev / Next) -->
+            <button id="prev-btn" aria-label="上一張" class="absolute left-4 top-1/2 -translate-y-1/2 bg-slate-900/60 hover:bg-indigo-600 text-white w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md border border-white/20 shadow-lg transition-all duration-300 opacity-80 group-hover:opacity-100 hover:scale-110">
+                <i class="fa-solid fa-chevron-left text-lg"></i>
+            </button>
+            <button id="next-btn" aria-label="下一張" class="absolute right-4 top-1/2 -translate-y-1/2 bg-slate-900/60 hover:bg-indigo-600 text-white w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md border border-white/20 shadow-lg transition-all duration-300 opacity-80 group-hover:opacity-100 hover:scale-110">
+                <i class="fa-solid fa-chevron-right text-lg"></i>
+            </button>
+
+            <!-- Pagination Dots Indicator -->
+            <div class="absolute bottom-4 right-6 md:right-10 flex space-x-2 z-10 bg-slate-950/40 px-4 py-2 rounded-full backdrop-blur-md border border-white/10" id="dots-container">
+                <!-- JavaScript will populate dots here -->
+            </div>
+        </div>
+    </main>
+
+    <div id="lightbox" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-xl flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300">
+        <button onclick="closeLightbox()" aria-label="關閉燈箱" class="absolute top-6 right-6 text-slate-400 hover:text-white bg-white/10 hover:bg-white/20 w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md transition-all">
+            <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+        <div class="max-w-4xl w-full max-h-[90vh] flex flex-col items-center">
+            <img id="lightbox-img" src="" alt="預覽大圖" class="max-h-[70vh] w-auto object-contain rounded-2xl shadow-2xl border border-white/10 mb-4">
+            <h3 id="lightbox-title" class="text-2xl font-bold text-white mb-2 text-center"></h3>
+            <p id="lightbox-desc" class="text-slate-300 text-center max-w-xl text-sm md:text-base"></p>
+        </div>
+    </div>
+
+    <footer class="w-full py-6 text-center text-slate-500 text-sm border-t border-white/5 bg-slate-950/30">
+        <p>&copy; 2026 Immersive Gallery. Designed with Tailwind CSS & JavaScript.</p>
+    </footer>
+
+    <script>
+        // Data source matching the slides
+        const slideData = [
+            {
+                title: "蔚藍海岸與金色沙灘",
+                desc: "享受陽光灑落的海濱假期，聆聽海浪拍打岸邊的療癒節奏，遠離城市喧囂。",
+                src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80"
+            },
+            {
+                title: "雲霧繚繞的群山之巔",
+                desc: "挑戰自我極限，登高望遠，欣賞大自然鬼斧神工的壯麗山景與遼闊視野。",
+                src: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80"
+            },
+            {
+                title: "霓虹閃爍的繁華都會",
+                desc: "夜幕低垂下的摩天大樓與車水馬龍，展現出人類文明的現代科技與藝術美感。",
+                src: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=1600&q=80"
+            },
+            {
+                title: "綠意盎然的原始密林",
+                desc: "陽光穿透高大樹冠灑落青苔地表，深呼吸感受大自然最純粹的芬多精與平靜。",
+                src: "https://images.unsplash.com/photo-1426604966848-d7adac902bff?auto=format&fit=crop&w=1600&q=80"
+            },
+            {
+                title: "浩瀚無垠的璀璨銀河",
+                desc: "繁星點點的夜空引人無限遐思，探索宇宙奧秘，感受自身的渺小與偉大。",
+                src: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1600&q=80"
+            }
+        ];
+
+        const track = document.getElementById('carousel-track');
+        const slides = Array.from(track.children);
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const dotsContainer = document.getElementById('dots-container');
+        const container = document.getElementById('carousel-container');
+
+        let currentIndex = 0;
+        const totalSlides = slides.length;
+        let autoPlayTimer = null;
+        const intervalTime = 4000; // 4 seconds
+
+        // Create pagination dots
+        slideData.forEach((_, index) => {
+            const dot = document.createElement('button');
+            dot.className = `w-3 h-3 rounded-full transition-all duration-300 ${index === 0 ? 'bg-indigo-500 w-6' : 'bg-white/40 hover:bg-white/70'}`;
+            dot.setAttribute('aria-label', `跳至第 ${index + 1} 張圖片`);
+            dot.addEventListener('click', () => {
+                currentIndex = index;
+                updateCarousel();
+                resetAutoPlay();
+            });
+            dotsContainer.appendChild(dot);
+        });
+
+        const dots = Array.from(dotsContainer.children);
+
+        function updateCarousel() {
+            track.style.transform = `translateX(-${currentIndex * 100}%)`;
+            dots.forEach((dot, index) => {
+                if (index === currentIndex) {
+                    dot.className = 'w-6 h-3 rounded-full transition-all duration-300 bg-indigo-500';
+                } else {
+                    dot.className = 'w-3 h-3 rounded-full transition-all duration-300 bg-white/40 hover:bg-white/70';
+                }
+            });
+        }
+
+        function nextSlide() {
+            currentIndex = (currentIndex + 1) % totalSlides;
+            updateCarousel();
+        }
+
+        function prevSlide() {
+            currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+            updateCarousel();
+        }
+
+        nextBtn.addEventListener('click', () => {
+            nextSlide();
+            resetAutoPlay();
+        });
+
+        prevBtn.addEventListener('click', () => {
+            prevSlide();
+            resetAutoPlay();
+        });
+
+        // Auto-play functions
+        function startAutoPlay() {
+            autoPlayTimer = setInterval(nextSlide, intervalTime);
+        }
+
+        function stopAutoPlay() {
+            clearInterval(autoPlayTimer);
+        }
+
+        function resetAutoPlay() {
+            stopAutoPlay();
+            startAutoPlay();
+        }
+
+        // Pause auto-play on mouse hover over carousel container
+        container.addEventListener('mouseenter', stopAutoPlay);
+        container.addEventListener('mouseleave', startAutoPlay);
+
+        // Lightbox Functions
+        function openLightbox(index) {
+            stopAutoPlay();
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            const lightboxTitle = document.getElementById('lightbox-title');
+            const lightboxDesc = document.getElementById('lightbox-desc');
+
+            lightboxImg.src = slideData[index].src;
+            lightboxTitle.textContent = slideData[index].title;
+            lightboxDesc.textContent = slideData[index].desc;
+
+            lightbox.classList.remove('opacity-0', 'pointer-events-none');
+            lightbox.classList.add('opacity-100', 'pointer-events-auto');
+        }
+
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.classList.remove('opacity-100', 'pointer-events-auto');
+            lightbox.classList.add('opacity-0', 'pointer-events-none');
+            startAutoPlay();
+        }
+
+        // Initialize auto-play on load
+        startAutoPlay();
+    </script>
+</body>
+</html>
