@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>專業線上倒數計時器</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0fdf4',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .timer-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        /* 自訂滑動條與動畫 */
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.95; transform: scale(0.995); }
+        }
+        .pulse-effect {
+            animation: pulse-subtle 2s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col justify-between transition-colors duration-300">
+
+    <header class="w-full max-w-4xl mx-auto px-4 py-6 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-emerald-500/30">
+                ⏱️
+            </div>
+            <h1 class="text-xl font-bold tracking-tight">Chronos<span class="text-emerald-500">Timer</span></h1>
+        </div>
+        <div class="flex items-center space-x-3">
+            <!-- 靜音開關按鈕 -->
+            <button id="sound-toggle-btn" onclick="toggleSound()" class="p-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 transition shadow-sm" title="音效開關">
+                🔔
+            </button>
+            <!-- 全螢幕切換按鈕 -->
+            <button onclick="toggleFullScreen()" class="p-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 transition shadow-sm" title="全螢幕模式">
+                🖵
+            </button>
+            <!-- 主題切換按鈕 -->
+            <button onclick="toggleDarkMode()" class="p-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 transition shadow-sm" title="切換明暗模式">
+                🌓
+            </button>
+        </div>
+    </header>
+
+    <main class="w-full max-w-2xl mx-auto px-4 flex-grow flex flex-col items-center justify-center py-6">
+        
+        <!-- 模式切換 Tabs -->
+        <div class="flex bg-slate-200 dark:bg-slate-900 p-1.5 rounded-2xl mb-8 shadow-inner w-full max-w-md">
+            <button onclick="switchMode('general')" id="tab-general" class="flex-1 py-2.5 text-sm font-semibold rounded-xl transition bg-white dark:bg-slate-800 shadow-sm text-emerald-600 dark:text-emerald-400">一般倒數</button>
+            <button onclick="switchMode('pomodoro')" id="tab-pomodoro" class="flex-1 py-2.5 text-sm font-semibold rounded-xl transition text-slate-600 dark:text-slate-400 hover:text-slate-900">蕃茄鐘 / 間歇</button>
+            <button onclick="switchMode('target')" id="tab-target" class="flex-1 py-2.5 text-sm font-semibold rounded-xl transition text-slate-600 dark:text-slate-400 hover:text-slate-900">目標日倒數</button>
+        </div>
+
+        <!-- 容器本體 -->
+        <div id="app-container" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl transition-all duration-300">
+            
+            <!-- 模式一：一般倒數計時器 -->
+            <div id="mode-general" class="space-y-8">
+                <div class="text-center">
+                    <span id="general-status-badge" class="px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400">準備就緒</span>
+                </div>
+
+                <!-- 圓形倒數視覺 / 數位顯示 -->
+                <div class="flex flex-col items-center justify-center py-4">
+                    <div id="general-timer-display" class="timer-font text-5xl sm:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white drop-shadow-sm">
+                        00:05:00
+                    </div>
+                    <p id="general-subtext" class="text-sm text-slate-500 dark:text-slate-400 mt-2">設定倒數時間並點擊開始</p>
+                </div>
+
+                <!-- 快捷選項 -->
+                <div class="grid grid-cols-5 gap-2">
+                    <button onclick="setGeneralPreset(60)" class="py-2 text-xs font-medium rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-700 hover:text-emerald-600 transition">1 分</button>
+                    <button onclick="setGeneralPreset(300)" class="py-2 text-xs font-medium rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-700 hover:text-emerald-600 transition">5 分</button>
+                    <button onclick="setGeneralPreset(600)" class="py-2 text-xs font-medium rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-700 hover:text-emerald-600 transition">10 分</button>
+                    <button onclick="setGeneralPreset(1800)" class="py-2 text-xs font-medium rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-700 hover:text-emerald-600 transition">30 分</button>
+                    <button onclick="setGeneralPreset(3600)" class="py-2 text-xs font-medium rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-700 hover:text-emerald-600 transition">1 小時</button>
+                </div>
+
+                <!-- 手動調整輸入區 -->
+                <div id="general-inputs" class="grid grid-cols-3 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <div class="flex flex-col items-center">
+                        <label class="text-xs text-slate-400 mb-1">小時</label>
+                        <input type="number" id="gen-hours" min="0" max="99" value="0" class="w-full text-center py-2 bg-slate-100 dark:bg-slate-800 rounded-xl font-bold text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <label class="text-xs text-slate-400 mb-1">分鐘</label>
+                        <input type="number" id="gen-minutes" min="0" max="59" value="5" class="w-full text-center py-2 bg-slate-100 dark:bg-slate-800 rounded-xl font-bold text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <label class="text-xs text-slate-400 mb-1">秒鐘</label>
+                        <input type="number" id="gen-seconds" min="0" max="59" value="0" class="w-full text-center py-2 bg-slate-100 dark:bg-slate-800 rounded-xl font-bold text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                </div>
+
+                <!-- 控制按鈕 -->
+                <div class="flex space-x-3 pt-4">
+                    <button id="gen-start-btn" onclick="startGeneralTimer()" class="flex-1 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-2xl shadow-lg shadow-emerald-500/20 transition transform active:scale-95">開始</button>
+                    <button id="gen-pause-btn" onclick="pauseGeneralTimer()" disabled class="flex-1 py-3.5 bg-slate-200 dark:bg-slate-800 text-slate-400 font-semibold rounded-2xl transition cursor-not-allowed">暫停</button>
+                    <button onclick="resetGeneralTimer()" class="px-5 py-3.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 font-semibold rounded-2xl transition">重設</button>
+                </div>
+            </div>
+
+            <!-- 模式二：蕃茄鐘 / 間歇訓練 -->
+            <div id="mode-pomodoro" class="hidden space-y-8">
+                <div class="flex justify-between items-center">
+                    <span id="pomo-phase-badge" class="px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-400">工作時間 (Work)</span>
+                    <span id="pomo-cycle-badge" class="text-xs font-medium text-slate-400">循環: 1 / 4</span>
+                </div>
+
+                <div class="flex flex-col items-center justify-center py-4">
+                    <div id="pomo-timer-display" class="timer-font text-5xl sm:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white drop-shadow-sm">
+                        25:00
+                    </div>
+                    <p id="pomo-subtext" class="text-sm text-slate-500 dark:text-slate-400 mt-2">保持專注，盡情發揮</p>
+                </div>
+
+                <!-- 參數設定 -->
+                <div class="grid grid-cols-3 gap-3 pt-2 border-t border-slate-100 dark:border-slate-800 text-sm">
+                    <div class="flex flex-col">
+                        <label class="text-xs text-slate-400 mb-1">工作 (分)</label>
+                        <input type="number" id="pomo-work-time" min="1" max="120" value="25" class="w-full text-center py-2 bg-slate-100 dark:bg-slate-800 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="text-xs text-slate-400 mb-1">休息 (分)</label>
+                        <input type="number" id="pomo-break-time" min="1" max="60" value="5" class="w-full text-center py-2 bg-slate-100 dark:bg-slate-800 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="text-xs text-slate-400 mb-1">循環次數</label>
+                        <input type="number" id="pomo-cycles" min="1" max="10" value="4" class="w-full text-center py-2 bg-slate-100 dark:bg-slate-800 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+
+                <div class="flex space-x-3 pt-2">
+                    <button id="pomo-start-btn" onclick="startPomodoro()" class="flex-1 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-2xl shadow-lg shadow-indigo-600/20 transition transform active:scale-95">開始專注</button>
+                    <button id="pomo-pause-btn" onclick="pausePomodoro()" disabled class="flex-1 py-3.5 bg-slate-200 dark:bg-slate-800 text-slate-400 font-semibold rounded-2xl transition cursor-not-allowed">暫停</button>
+                    <button onclick="resetPomodoro()" class="px-5 py-3.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 font-semibold rounded-2xl transition">重設</button>
+                </div>
+            </div>
+
+            <!-- 模式三：特定目標日倒數 -->
+            <div id="mode-target" class="hidden space-y-8">
+                <div class="text-center">
+                    <span id="target-title-display" class="px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">自訂事件倒數</span>
+                </div>
+
+                <div class="grid grid-cols-4 gap-2 text-center py-2">
+                    <div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-2xl">
+                        <div id="target-days" class="timer-font text-2xl sm:text-4xl font-bold text-slate-900 dark:text-white">00</div>
+                        <div class="text-xs text-slate-400 mt-1">天</div>
+                    </div>
+                    <div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-2xl">
+                        <div id="target-hours" class="timer-font text-2xl sm:text-4xl font-bold text-slate-900 dark:text-white">00</div>
+                        <div class="text-xs text-slate-400 mt-1">時</div>
+                    </div>
+                    <div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-2xl">
+                        <div id="target-minutes" class="timer-font text-2xl sm:text-4xl font-bold text-slate-900 dark:text-white">00</div>
+                        <div class="text-xs text-slate-400 mt-1">分</div>
+                    </div>
+                    <div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-2xl">
+                        <div id="target-seconds" class="timer-font text-2xl sm:text-4xl font-bold text-slate-900 dark:text-white">00</div>
+                        <div class="text-xs text-slate-400 mt-1">秒</div>
+                    </div>
+                </div>
+
+                <!-- 目標設定表單 -->
+                <div class="space-y-4 pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <div>
+                        <label class="text-xs text-slate-400 mb-1 block">事件名稱</label>
+                        <input type="text" id="target-event-name" value="跨年倒數" class="w-full px-4 py-2.5 bg-slate-100 dark:bg-slate-800 rounded-xl font-medium focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 mb-1 block">目標日期與時間</label>
+                        <input type="datetime-local" id="target-datetime" class="w-full px-4 py-2.5 bg-slate-100 dark:bg-slate-800 rounded-xl font-medium focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    </div>
+                </div>
+
+                <div class="flex space-x-3 pt-2">
+                    <button onclick="startTargetTimer()" class="flex-1 py-3.5 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-2xl shadow-lg shadow-amber-500/20 transition transform active:scale-95">套用並追蹤</button>
+                    <button onclick="setPresetTarget('newyear')" class="px-4 py-3.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-xs font-semibold rounded-2xl transition">下個跨年</button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="w-full max-w-4xl mx-auto px-4 py-6 text-center text-xs text-slate-400">
+        &copy; 2026 ChronosTimer. 現代高效率線上計時工具.
+    </footer>
+
+    <script>
+        // --- 簡易自訂訊息提示框（替代 alert） ---
+        function showNotification(message) {
+            const existing = document.getElementById('custom-toast');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.id = 'custom-toast';
+            toast.className = 'fixed bottom-6 right-6 z-50 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-6 py-3 rounded-2xl shadow-2xl font-medium text-sm transition-all transform translate-y-2 opacity-0';
+            toast.innerText = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => { toast.classList.remove('translate-y-2', 'opacity-0'); }, 10);
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // --- Web Audio API 提示音生成 ---
+        let soundEnabled = true;
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const btn = document.getElementById('sound-toggle-btn');
+            btn.innerText = soundEnabled ? '🔔' : '🔕';
+            showNotification(soundEnabled ? '音效已開啟' : '音效已關閉');
+        }
+
+        function playAlertSound() {
+            if (!soundEnabled) return;
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                const ctx = new AudioContext();
+
+                // 播放三聲清脆的提示音
+                const now = ctx.currentTime;
+                for (let i = 0; i < 3; i++) {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(587.33, now + i * 0.2); // D5 音高
+                    
+                    gain.gain.setValueAtTime(0.2, now + i * 0.2);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.2 + 0.15);
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    osc.start(now + i * 0.2);
+                    osc.stop(now + i * 0.2 + 0.16);
+                }
+            } catch (e) {
+                console.error('Web Audio API error:', e);
+            }
+        }
+
+        // --- 全螢幕與主題切換 ---
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    showNotification('無法切換全螢幕模式');
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // 初始化載入主題
+        if (localStorage.getItem('theme') === 'light') {
+            document.documentElement.classList.remove('dark');
+        }
+
+        // --- 模式切換邏輯 ---
+        function switchMode(mode) {
+            // 停止所有進行中的計時器
+            pauseGeneralTimer();
+            pausePomodoro();
+            if (targetInterval) clearInterval(targetInterval);
+
+            // 切換 Tab 樣式
+            ['general', 'pomodoro', 'target'].forEach(m => {
+                const tab = document.getElementById(`tab-${m}`);
+                const panel = document.getElementById(`mode-${m}`);
+                if (m === mode) {
+                    tab.className = "flex-1 py-2.5 text-sm font-semibold rounded-xl transition bg-white dark:bg-slate-800 shadow-sm text-emerald-600 dark:text-emerald-400";
+                    panel.classList.remove('hidden');
+                } else {
+                    tab.className = "flex-1 py-2.5 text-sm font-semibold rounded-xl transition text-slate-600 dark:text-slate-400 hover:text-slate-900";
+                    panel.classList.add('hidden');
+                }
+            });
+
+            if (mode === 'target') {
+                initTargetDefault();
+            }
+        }
+
+        // --- 模式一：一般倒數計時器邏輯 ---
+        let genTotalSeconds = 300;
+        let genCurrentSeconds = 300;
+        let genTimerInterval = null;
+        let genIsRunning = false;
+
+        function setGeneralPreset(seconds) {
+            if (genIsRunning) return;
+            genTotalSeconds = seconds;
+            genCurrentSeconds = seconds;
+            updateGeneralDisplayInputs();
+            updateGeneralDisplay();
+        }
+
+        function updateGeneralDisplayInputs() {
+            const h = Math.floor(genCurrentSeconds / 3600);
+            const m = Math.floor((genCurrentSeconds % 3600) / 60);
+            const s = genCurrentSeconds % 60;
+            document.getElementById('gen-hours').value = h;
+            document.getElementById('gen-minutes').value = m;
+            document.getElementById('gen-seconds').value = s;
+        }
+
+        function readGeneralInputs() {
+            const h = parseInt(document.getElementById('gen-hours').value) || 0;
+            const m = parseInt(document.getElementById('gen-minutes').value) || 0;
+            const s = parseInt(document.getElementById('gen-seconds').value) || 0;
+            return h * 3600 + m * 60 + s;
+        }
+
+        function updateGeneralDisplay() {
+            const h = Math.floor(genCurrentSeconds / 3600);
+            const m = Math.floor((genCurrentSeconds % 3600) / 60);
+            const s = genCurrentSeconds % 60;
+            
+            const timeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            document.getElementById('general-timer-display').innerText = timeStr;
+            
+            // 更新網頁標題
+            if (genIsRunning) {
+                document.title = `(${timeStr}) 倒數計時中 - Chronos`;
+            }
+        }
+
+        function startGeneralTimer() {
+            if (!genIsRunning) {
+                const inputSec = readGeneralInputs();
+                if (inputSec <= 0) {
+                    showNotification('請設定大於 0 的倒數時間');
+                    return;
+                }
+                if (genCurrentSeconds === genTotalSeconds || genCurrentSeconds === 0) {
+                    genTotalSeconds = inputSec;
+                    genCurrentSeconds = inputSec;
+                }
+            }
+
+            genIsRunning = true;
+            document.getElementById('gen-start-btn').disabled = true;
+            document.getElementById('gen-start-btn').classList.add('opacity-50', 'cursor-not-allowed');
+            document.getElementById('gen-pause-btn').disabled = false;
+            document.getElementById('gen-pause-btn').classList.remove('bg-slate-200', 'dark:bg-slate-800', 'text-slate-400', 'cursor-not-allowed');
+            document.getElementById('gen-pause-btn').classList.add('bg-amber-500', 'hover:bg-amber-600', 'text-white', 'shadow-lg', 'shadow-amber-500/20');
+            document.getElementById('gen-pause-btn').innerText = '暫停';
+            document.getElementById('general-status-badge').innerText = '計時中...';
+            document.getElementById('general-status-badge').className = 'px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400';
+
+            clearInterval(genTimerInterval);
+            genTimerInterval = setInterval(() => {
+                if (genCurrentSeconds > 0) {
+                    genCurrentSeconds--;
+                    updateGeneralDisplay();
+                } else {
+                    pauseGeneralTimer();
+                    playAlertSound();
+                    document.getElementById('general-status-badge').innerText = '時間到！';
+                    document.getElementById('general-status-badge').className = 'px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-400';
+                    document.title = '時間到！ - Chronos';
+                    showNotification('計時結束！');
+                }
+            }, 1000);
+        }
+
+        function pauseGeneralTimer() {
+            genIsRunning = false;
+            clearInterval(genTimerInterval);
+            document.getElementById('gen-start-btn').disabled = false;
+            document.getElementById('gen-start-btn').classList.remove('opacity-50', 'cursor-not-allowed');
+            document.getElementById('gen-pause-btn').disabled = true;
+            document.getElementById('gen-pause-btn').classList.add('bg-slate-200', 'dark:bg-slate-800', 'text-slate-400', 'cursor-not-allowed');
+            document.getElementById('gen-pause-btn').classList.remove('bg-amber-500', 'hover:bg-amber-600', 'text-white', 'shadow-lg', 'shadow-amber-500/20');
+            document.getElementById('general-status-badge').innerText = '已暫停';
+            document.getElementById('general-status-badge').className = 'px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-400';
+            document.title = '專業線上線上倒數計時器';
+        }
+
+        function resetGeneralTimer() {
+            pauseGeneralTimer();
+            genTotalSeconds = readGeneralInputs() || 300;
+            genCurrentSeconds = genTotalSeconds;
+            updateGeneralDisplay();
+            document.getElementById('general-status-badge').innerText = '準備就緒';
+            document.getElementById('general-status-badge').className = 'px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400';
+        }
+
+        // 監聽一般計時器輸入變更
+        ['gen-hours', 'gen-minutes', 'gen-seconds'].forEach(id => {
+            document.getElementById(id).addEventListener('change', () => {
+                if (!genIsRunning) {
+                    genTotalSeconds = readGeneralInputs();
+                    genCurrentSeconds = genTotalSeconds;
+                    updateGeneralDisplay();
+                }
+            });
+        });
+
+        // --- 模式二：蕃茄鐘 / 間歇訓練邏輯 ---
+        let pomoState = 'work'; // 'work' or 'break'
+        let pomoCurrentSeconds = 25 * 60;
+        let pomoCurrentCycle = 1;
+        let pomoTotalCycles = 4;
+        let pomoInterval = null;
+        let pomoIsRunning = false;
+
+        function updatePomoDisplay() {
+            const m = Math.floor(pomoCurrentSeconds / 60);
+            const s = pomoCurrentSeconds % 60;
+            const timeStr = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            document.getElementById('pomo-timer-display').innerText = timeStr;
+            document.getElementById('pomo-cycle-badge').innerText = `循環: ${pomoCurrentCycle} / ${pomoTotalCycles}`;
+            
+            if (pomoIsRunning) {
+                document.title = `(${timeStr}) ${pomoState === 'work' ? '專注中' : '休息中'} - Chronos`;
+            }
+        }
+
+        function startPomodoro() {
+            if (!pomoIsRunning) {
+                const workMin = parseInt(document.getElementById('pomo-work-time').value) || 25;
+                const breakMin = parseInt(document.getElementById('pomo-break-time').value) || 5;
+                pomoTotalCycles = parseInt(document.getElementById('pomo-cycles').value) || 4;
+                
+                if (pomoCurrentSeconds === (workMin * 60) || pomoCurrentSeconds === 0) {
+                    pomoCurrentSeconds = workMin * 60;
+                }
+            }
+
+            pomoIsRunning = true;
+            document.getElementById('pomo-start-btn').disabled = true;
+            document.getElementById('pomo-start-btn').classList.add('opacity-50', 'cursor-not-allowed');
+            document.getElementById('pomo-pause-btn').disabled = false;
+            document.getElementById('pomo-pause-btn').classList.remove('bg-slate-200', 'dark:bg-slate-800', 'text-slate-400', 'cursor-not-allowed');
+            document.getElementById('pomo-pause-btn').classList.add('bg-amber-500', 'hover:bg-amber-600', 'text-white', 'shadow-lg', 'shadow-amber-500/20');
+            
+            clearInterval(pomoInterval);
+            pomoInterval = setInterval(() => {
+                if (pomoCurrentSeconds > 0) {
+                    pomoCurrentSeconds--;
+                    updatePomoDisplay();
+                } else {
+                    playAlertSound();
+                    const workMin = parseInt(document.getElementById('pomo-work-time').value) || 25;
+                    const breakMin = parseInt(document.getElementById('pomo-break-time').value) || 5;
+
+                    if (pomoState === 'work') {
+                        // 轉換到休息時間
+                        pomoState = 'break';
+                        pomoCurrentSeconds = breakMin * 60;
+                        document.getElementById('pomo-phase-badge').innerText = '休息時間 (Break)';
+                        document.getElementById('pomo-phase-badge').className = 'px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400';
+                        showNotification('工作時間結束，開始休息吧！');
+                    } else {
+                        // 轉換到下一個循環或結束
+                        if (pomoCurrentCycle < pomoTotalCycles) {
+                            pomoCurrentCycle++;
+                            pomoState = 'work';
+                            pomoCurrentSeconds = workMin * 60;
+                            document.getElementById('pomo-phase-badge').innerText = '工作時間 (Work)';
+                            document.getElementById('pomo-phase-badge').className = 'px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-400';
+                            showNotification(`開始第 ${pomoCurrentCycle} 循環專注！`);
+                        } else {
+                            pausePomodoro();
+                            showNotification('恭喜完成所有循環！');
+                            document.getElementById('pomo-phase-badge').innerText = '全部完成！';
+                            return;
+                        }
+                    }
+                    updatePomoDisplay();
+                }
+            }, 1000);
+        }
+
+        function pausePomodoro() {
+            pomoIsRunning = false;
+            clearInterval(pomoInterval);
+            document.getElementById('pomo-start-btn').disabled = false;
+            document.getElementById('pomo-start-btn').classList.remove('opacity-50', 'cursor-not-allowed');
+            document.getElementById('pomo-pause-btn').disabled = true;
+            document.getElementById('pomo-pause-btn').classList.add('bg-slate-200', 'dark:bg-slate-800', 'text-slate-400', 'cursor-not-allowed');
+            document.getElementById('pomo-pause-btn').classList.remove('bg-amber-500', 'hover:bg-amber-600', 'text-white', 'shadow-lg', 'shadow-amber-500/20');
+            document.title = '專業線上倒數計時器';
+        }
+
+        function resetPomodoro() {
+            pausePomodoro();
+            pomoState = 'work';
+            pomoCurrentCycle = 1;
+            const workMin = parseInt(document.getElementById('pomo-work-time').value) || 25;
+            pomoCurrentSeconds = workMin * 60;
+            document.getElementById('pomo-phase-badge').innerText = '工作時間 (Work)';
+            document.getElementById('pomo-phase-badge').className = 'px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-400';
+            updatePomoDisplay();
+        }
+
+        // --- 模式三：特定目標日倒數邏輯 ---
+        let targetInterval = null;
+
+        function initTargetDefault() {
+            const now = new Date();
+            const nextYear = new Date(now.getFullYear() + 1, 0, 1, 0, 0, 0);
+            
+            // 轉換為 datetime-local 格式
+            const pad = (n) => String(n).padStart(2, '0');
+            const formatted = `${nextYear.getFullYear()}-${pad(nextYear.getMonth() + 1)}-${pad(nextYear.getDate())}T${pad(nextYear.getHours())}:${pad(nextYear.getMinutes())}`;
+            
+            document.getElementById('target-datetime').value = formatted;
+            startTargetTimer();
+        }
+
+        function setPresetTarget(type) {
+            const now = new Date();
+            let targetDate;
+            let name = "";
+            if (type === 'newyear') {
+                targetDate = new Date(now.getFullYear() + 1, 0, 1, 0, 0, 0);
+                name = `${now.getFullYear() + 1} 新年倒數`;
+            }
+            
+            const pad = (n) => String(n).padStart(2, '0');
+            const formatted = `${targetDate.getFullYear()}-${pad(targetDate.getMonth() + 1)}-${pad(targetDate.getDate())}T${pad(targetDate.getHours())}:${pad(targetDate.getMinutes())}`;
+            
+            document.getElementById('target-datetime').value = formatted;
+            document.getElementById('target-event-name').value = name;
+            startTargetTimer();
+        }
+
+        function startTargetTimer() {
+            if (targetInterval) clearInterval(targetInterval);
+            
+            const eventName = document.getElementById('target-event-name').value || '指定目標日';
+            document.getElementById('target-title-display').innerText = eventName;
+
+            const updateTarget = () => {
+                const datetimeVal = document.getElementById('target-datetime').value;
+                if (!datetimeVal) return;
+
+                const targetTime = new Date(datetimeVal).getTime();
+                const now = new Date().getTime();
+                const diff = targetTime - now;
+
+                if (diff <= 0) {
+                    document.getElementById('target-days').innerText = '00';
+                    document.getElementById('target-hours').innerText = '00';
+                    document.getElementById('target-minutes').innerText = '00';
+                    document.getElementById('target-seconds').innerText = '00';
+                    document.getElementById('target-title-display').innerText = `${eventName} - 已到達！`;
+                    return;
+                }
+
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                document.getElementById('target-days').innerText = String(days).padStart(2, '0');
+                document.getElementById('target-hours').innerText = String(hours).padStart(2, '0');
+                document.getElementById('target-minutes').innerText = String(minutes).padStart(2, '0');
+                document.getElementById('target-seconds').innerText = String(seconds).padStart(2, '0');
+            };
+
+            updateTarget();
+            targetInterval = setInterval(updateTarget, 1000);
+            showNotification('已成功設定目標倒數！');
+        }
+
+        // 初始載入一般計時器顯示
+        updateGeneralDisplay();
+    </script>
+</body>
+</html>
