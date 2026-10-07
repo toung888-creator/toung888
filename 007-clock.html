@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>質感暗色系指針時鐘</title>
+    <!-- Tailwind CSS for styling framework -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+        }
+        
+        /* 玻璃擬態風格外框與發光效果 */
+        .clock-container {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7),
+                        inset 0 1px 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        /* 指針基礎樣式與旋轉中心 */
+        .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom center;
+            border-radius: 9999px;
+            transition: transform 0.05s cubic-bezier(0.4, 2.3, 0.6, 1);
+        }
+
+        /* 時針 */
+        .hour-hand {
+            width: 6px;
+            height: 28%;
+            background: linear-gradient(to top, #cbd5e1, #f8fafc);
+            transform: translateX(-50%) rotate(0deg);
+            z-index: 12;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        /* 分針 */
+        .minute-hand {
+            width: 4px;
+            height: 38%;
+            background: linear-gradient(to top, #94a3b8, #e2e8f0);
+            transform: translateX(-50%) rotate(0deg);
+            z-index: 13;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        /* 秒針 */
+        .second-hand {
+            width: 2px;
+            height: 42%;
+            background: #f43f5e; /* 亮紅色秒針 */
+            transform: translateX(-50%) rotate(0deg);
+            z-index: 14;
+            box-shadow: 0 0 10px rgba(244, 63, 94, 0.5);
+        }
+
+        /* 秒針尾部突起設計 */
+        .second-hand::after {
+            content: '';
+            position: absolute;
+            bottom: -20%;
+            left: -3px;
+            width: 8px;
+            height: 15px;
+            background: #f43f5e;
+            border-radius: 4px;
+        }
+
+        /* 中心軸珠 */
+        .clock-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle, #f43f5e 0%, #be123c 100%);
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            box-shadow: 0 0 10px rgba(244, 63, 94, 0.8);
+        }
+
+        /* 脈衝動畫效果 */
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; filter: drop-shadow(0 0 15px rgba(56, 189, 248, 0.6)); }
+        }
+        .glow-effect {
+            animation: pulse-glow 4s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center text-slate-100 overflow-hidden select-none p-4">
+
+    <div class="absolute top-6 text-center">
+        <h1 class="text-xl md:text-2xl font-semibold tracking-wider text-slate-200">精美現代暗色系時鐘</h1>
+        <p class="text-xs md:text-sm text-slate-400 mt-1" id="date-display">載入日期中...</p>
+    </div>
+
+    <main class="relative flex items-center justify-center my-auto">
+        <!-- 外圈裝飾光暈 -->
+        <div class="absolute w-[320px] h-[320px] md:w-[420px] md:h-[420px] rounded-full bg-sky-500/10 blur-2xl glow-effect pointer-events-none"></div>
+
+        <!-- 時鐘主體 -->
+        <div class="clock-container relative w-[290px] h-[290px] md:w-[380px] md:h-[380px] rounded-full flex items-center justify-center shadow-2xl">
+            
+            <!-- 錶盤刻度與數字容器 -->
+            <div id="dial-markers" class="absolute inset-0 rounded-full">
+                <!-- 動態由 JavaScript 生成數字與刻度線以確保完美對齊 -->
+            </div>
+
+            <!-- 時針 -->
+            <div id="hour-hand" class="hand hour-hand"></div>
+            <!-- 分針 -->
+            <div id="minute-hand" class="hand minute-hand"></div>
+            <!-- 秒針 -->
+            <div id="second-hand" class="hand second-hand"></div>
+
+            <!-- 中心裝飾軸 -->
+            <div class="clock-center"></div>
+
+            <!-- 品牌或特色文字 (面盤內) -->
+            <div class="absolute bottom-20 text-[10px] md:text-xs font-medium tracking-widest text-slate-500 uppercase">
+                Precision Quartz
+            </div>
+        </div>
+    </main>
+
+    <footer class="absolute bottom-6 text-center flex flex-col items-center gap-2">
+        <div class="flex items-center gap-3 bg-slate-800/60 backdrop-blur-md px-4 py-2 rounded-full border border-slate-700/50 shadow-lg">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+            <span class="text-xs md:text-sm font-mono text-slate-300" id="digital-clock">00:00:00</span>
+        </div>
+        <p class="text-[11px] text-slate-500">© 2026 Modern Analog Clock • 支援系統時間同步</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const dialMarkers = document.getElementById('dial-markers');
+            const hourHand = document.getElementById('hour-hand');
+            const minuteHand = document.getElementById('minute-hand');
+            const secondHand = document.getElementById('second-hand');
+            const digitalClock = document.getElementById('digital-clock');
+            const dateDisplay = document.getElementById('date-display');
+
+            // 1. 動態生成錶盤刻度與數字標示
+            function generateDial() {
+                // 產生 60 個小刻度/大刻度
+                for (let i = 0; i < 60; i++) {
+                    const angle = i * 6; // 360度 / 60 = 6度
+                    const isMajor = i % 5 === 0; // 每 5 格為整點大刻度
+                    
+                    const marker = document.createElement('div');
+                    marker.className = 'absolute top-0 left-1/2 -translate-x-1/2 h-full pointer-events-none';
+                    marker.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+                    
+                    const line = document.createElement('div');
+                    if (isMajor) {
+                        line.className = 'w-[2px] h-[12px] bg-slate-300 rounded-full mt-2';
+                    } else {
+                        line.className = 'w-[1px] h-[6px] bg-slate-600 rounded-full mt-2';
+                    }
+                    
+                    marker.appendChild(line);
+                    dialMarkers.appendChild(marker);
+                }
+
+                // 產生 12 個數字標示
+                for (let num = 1; num <= 12; num++) {
+                    const angle = num * 30; // 360度 / 12 = 30度
+                    const radius = 38; // 距離中心的百分比半徑
+                    
+                    // 利用三角函數計算精確位置
+                    const radian = (angle - 90) * (Math.PI / 180);
+                    const x = 50 + radius * Math.cos(radian);
+                    const y = 50 + radius * Math.sin(radian);
+
+                    const numElement = document.createElement('div');
+                    numElement.className = 'absolute text-xs md:text-base font-semibold text-slate-300 -translate-x-1/2 -translate-y-1/2';
+                    numElement.style.left = `${x}%`;
+                    numElement.style.top = `${y}%`;
+                    numElement.textContent = num;
+                    
+                    dialMarkers.appendChild(numElement);
+                }
+            }
+
+            // 2. 更新時鐘指針角度與數位時間
+            function updateClock() {
+                const now = new Date();
+                
+                const hours = now.getHours();
+                const minutes = now.getMinutes();
+                const seconds = now.getSeconds();
+                const milliseconds = now.getMilliseconds();
+
+                // 計算精確的轉動角度（包含毫秒平滑過渡）
+                const secondDegrees = ((seconds + milliseconds / 1000) / 60) * 360;
+                const minuteDegrees = ((minutes + seconds / 60) / 60) * 360;
+                const hourDegrees = (((hours % 12) + minutes / 60) / 12) * 360;
+
+                // 套用旋轉樣式
+                secondHand.style.transform = `translateX(-50%) rotate(${secondDegrees}deg)`;
+                minuteHand.style.transform = `translateX(-50%) rotate(${minuteDegrees}deg)`;
+                hourHand.style.transform = `translateX(-50%) rotate(${hourDegrees}deg)`;
+
+                // 更新下方數位時間與日期文字
+                const hoursStr = String(hours).padStart(2, '0');
+                const minutesStr = String(minutes).padStart(2, '0');
+                const secondsStr = String(seconds).padStart(2, '0');
+                digitalClock.textContent = `${hoursStr}:${minutesStr}:${secondsStr}`;
+
+                const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+                dateDisplay.textContent = now.toLocaleDateString('zh-TW', options);
+
+                requestAnimationFrame(updateClock);
+            }
+
+            // 初始化執行
+            generateDial();
+            requestAnimationFrame(updateClock);
+        });
+    </script>
+</body>
+</html>

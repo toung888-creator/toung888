@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>精美網頁版計算機</title>
+    <!-- Tailwind CSS for modern utility-first styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for clean typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom glassmorphism and smooth button press effects */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .btn-hover {
+            transition: all 0.15s ease-in-out;
+        }
+        .btn-hover:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="glass-panel shadow-2xl rounded-3xl p-6 w-full max-w-sm sm:max-w-md">
+        
+        <!-- App Header / Title -->
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-xl font-bold text-slate-800 tracking-wide">計算機(Calculator)</h1>
+            <div class="flex space-x-1.5">
+                <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                <div class="w-3 h-3 rounded-full bg-green-400"></div>
+            </div>
+        </div>
+
+        <!-- Calculator Display -->
+        <div class="bg-slate-900/90 rounded-2xl p-4 mb-6 shadow-inner text-right overflow-hidden border border-slate-700/50">
+            <div id="previous-operand" class="text-slate-400 text-sm h-6 overflow-x-auto whitespace-nowrap tracking-wider"></div>
+            <div id="current-operand" class="text-white text-4xl font-semibold h-12 overflow-x-auto whitespace-nowrap tracking-tight">0</div>
+        </div>
+
+        <!-- Keypad Grid -->
+        <div class="grid grid-cols-4 gap-3.5">
+            <!-- Row 1: Clear, Backspace, Percentage, Division -->
+            <button onclick="clearDisplay()" class="btn-hover bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold py-4 rounded-2xl text-lg shadow-sm border border-rose-100">AC</button>
+            <button onclick="deleteDigit()" class="btn-hover bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold py-4 rounded-2xl text-lg shadow-sm border border-slate-200 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414-6.414a2 2 0 011.414-.586H19a2 2 0 012 2v12a2 2 0 01-2 2h-8.172a2 2 0 01-1.414-.586L3 12z" />
+                </svg>
+            </button>
+            <button onclick="appendOperator('%')" class="btn-hover bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-semibold py-4 rounded-2xl text-lg shadow-sm border border-indigo-100">%</button>
+            <button onclick="appendOperator('÷')" class="btn-hover bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-4 rounded-2xl text-lg shadow-md shadow-indigo-500/30">÷</button>
+
+            <!-- Row 2: 7, 8, 9, Multiplication -->
+            <button onclick="appendNumber('7')" class="btn-hover bg-white/80 hover:bg-white text-slate-700 font-semibold py-4 rounded-2xl text-xl shadow-sm border border-slate-100">7</button>
+            <button onclick="appendNumber('8')" class="btn-hover bg-white/80 hover:bg-white text-slate-700 font-semibold py-4 rounded-2xl text-xl shadow-sm border border-slate-100">8</button>
+            <button onclick="appendNumber('9')" class="btn-hover bg-white/80 hover:bg-white text-slate-700 font-semibold py-4 rounded-2xl text-xl shadow-sm border border-slate-100">9</button>
+            <button onclick="appendOperator('×')" class="btn-hover bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-4 rounded-2xl text-lg shadow-md shadow-indigo-500/30">×</button>
+
+            <!-- Row 3: 4, 5, 6, Subtraction -->
+            <button onclick="appendNumber('4')" class="btn-hover bg-white/80 hover:bg-white text-slate-700 font-semibold py-4 rounded-2xl text-xl shadow-sm border border-slate-100">4</button>
+            <button onclick="appendNumber('5')" class="btn-hover bg-white/80 hover:bg-white text-slate-700 font-semibold py-4 rounded-2xl text-xl shadow-sm border border-slate-100">5</button>
+            <button onclick="appendNumber('6')" class="btn-hover bg-white/80 hover:bg-white text-slate-700 font-semibold py-4 rounded-2xl text-xl shadow-sm border border-slate-100">6</button>
+            <button onclick="appendOperator('-')" class="btn-hover bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-4 rounded-2xl text-lg shadow-md shadow-indigo-500/30">-</button>
+
+            <!-- Row 4: 1, 2, 3, Addition -->
+            <button onclick="appendNumber('1')" class="btn-hover bg-white/80 hover:bg-white text-slate-700 font-semibold py-4 rounded-2xl text-xl shadow-sm border border-slate-100">1</button>
+            <button onclick="appendNumber('2')" class="btn-hover bg-white/80 hover:bg-white text-slate-700 font-semibold py-4 rounded-2xl text-xl shadow-sm border border-slate-100">2</button>
+            <button onclick="appendNumber('3')" class="btn-hover bg-white/80 hover:bg-white text-slate-700 font-semibold py-4 rounded-2xl text-xl shadow-sm border border-slate-100">3</button>
+            <button onclick="appendOperator('+')" class="btn-hover bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-4 rounded-2xl text-lg shadow-md shadow-indigo-500/30">+</button>
+
+            <!-- Row 5: 0, Dot, Equals -->
+            <button onclick="appendNumber('0')" class="btn-hover bg-white/80 hover:bg-white text-slate-700 font-semibold py-4 rounded-2xl text-xl shadow-sm border border-slate-100 col-span-2">0</button>
+            <button onclick="appendDecimal()" class="btn-hover bg-white/80 hover:bg-white text-slate-700 font-semibold py-4 rounded-2xl text-xl shadow-sm border border-slate-100">.</button>
+            <button onclick="compute()" class="btn-hover bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-semibold py-4 rounded-2xl text-lg shadow-md shadow-rose-500/30">=</button>
+        </div>
+    </div>
+
+    <script>
+        // State variables for calculation
+        let currentOperandScreen = document.getElementById('current-operand');
+        let previousOperandScreen = document.getElementById('previous-operand');
+        
+        let currentInput = '0';
+        let previousInput = '';
+        let operation = null;
+        let resetScreen = false;
+
+        // Update the screen UI
+        function updateDisplay() {
+            currentOperandScreen.innerText = currentInput;
+            if (operation != null) {
+                previousOperandScreen.innerText = `${previousInput} ${operation}`;
+            } else {
+                previousOperandScreen.innerText = '';
+            }
+        }
+
+        // Append number to the current input
+        function appendNumber(number) {
+            if (currentInput === '0' || resetScreen) {
+                currentInput = number;
+                resetScreen = false;
+            } else {
+                currentInput += number;
+            }
+            updateDisplay();
+        }
+
+        // Append decimal point safely
+        function appendDecimal() {
+            if (resetScreen) {
+                currentInput = '0.';
+                resetScreen = false;
+                updateDisplay();
+                return;
+            }
+            if (!currentInput.includes('.')) {
+                currentInput += '.';
+            }
+            updateDisplay();
+        }
+
+        // Handle operator selection (+, -, ×, ÷, %)
+        function appendOperator(op) {
+            if (operation !== null && !resetScreen) {
+                compute();
+            }
+            previousInput = currentInput;
+            operation = op;
+            resetScreen = true;
+            updateDisplay();
+        }
+
+        // Perform the mathematical calculation
+        function compute() {
+            let computation;
+            const prev = parseFloat(previousInput);
+            const current = parseFloat(currentInput);
+
+            if (isNaN(prev) || isNaN(current)) return;
+
+            switch (operation) {
+                case '+':
+                    computation = prev + current;
+                    break;
+                case '-':
+                    computation = prev - current;
+                    break;
+                case '×':
+                    computation = prev * current;
+                    break;
+                case '÷':
+                    if (current === 0) {
+                        showError("不能除以零");
+                        return;
+                    }
+                    computation = prev / current;
+                    break;
+                case '%':
+                    computation = (prev * current) / 100;
+                    break;
+                default:
+                    return;
+            }
+
+            // Handle precision floating issues gracefully
+            currentInput = Math.round(computation * 100000000) / 100000000;
+            operation = null;
+            previousInput = '';
+            resetScreen = true;
+            updateDisplay();
+        }
+
+        // Clear all entries (AC)
+        function clearDisplay() {
+            currentInput = '0';
+            previousInput = '';
+            operation = null;
+            updateDisplay();
+        }
+
+        // Delete last character (Backspace)
+        function deleteDigit() {
+            if (resetScreen) return;
+            if (currentInput.length === 1 || (currentInput.length === 2 && currentInput.startsWith('-'))) {
+                currentInput = '0';
+            } else {
+                currentInput = currentInput.slice(0, -1);
+            }
+            updateDisplay();
+        }
+
+        // Simple customized notification instead of alert()
+        function showError(msg) {
+            currentInput = msg;
+            updateDisplay();
+            setTimeout(() => {
+                clearDisplay();
+            }, 1500);
+        }
+
+        // Keyboard support for enhanced accessibility
+        window.addEventListener('keydown', e => {
+            if (e.key >= '0' && e.key <= '9') appendNumber(e.key);
+            if (e.key === '.') appendDecimal();
+            if (e.key === '=' || e.key === 'Enter') compute();
+            if (e.key === 'Backspace') deleteDigit();
+            if (e.key === 'Escape') clearDisplay();
+            if (e.key === '+') appendOperator('+');
+            if (e.key === '-') appendOperator('-');
+            if (e.key === '*') appendOperator('×');
+            if (e.key === '/') appendOperator('÷');
+            if (e.key === '%') appendOperator('%');
+        });
+
+        // Initialize screen state
+        updateDisplay();
+    </script>
+</body>
+</html>

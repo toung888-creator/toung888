@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>翻頁時鐘</title>
+<style>
+*{box-sizing:border-box}
+html,body{width:100%;height:100%;margin:0}
+body{
+  background:#111;
+  color:#eee;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:Arial,"Noto Sans TC",sans-serif;
+  overflow:hidden;
+}
+.clock{
+  display:flex;
+  align-items:center;
+  gap:clamp(8px,1.2vw,18px);
+}
+.group{display:flex;gap:clamp(5px,.7vw,10px)}
+.digit{
+  position:relative;
+  width:clamp(52px,9vw,125px);
+  height:clamp(74px,14vw,165px);
+  border-radius:10px;
+  overflow:hidden;
+  background:#222;
+  box-shadow:0 8px 25px #0009;
+}
+.half{
+  position:absolute;
+  left:0;
+  width:100%;
+  height:50%;
+  overflow:hidden;
+  background:linear-gradient(#292929,#1b1b1b);
+  font-size:clamp(50px,10vw,120px);
+  font-weight:700;
+  line-height:1;
+}
+.half span{
+  position:absolute;
+  left:0;
+  width:100%;
+  height:200%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+.top{top:0;border-bottom:1px solid #090909}
+.top span{top:0}
+.bottom{bottom:0;border-top:1px solid #090909}
+.bottom span{bottom:0}
+.top:after,.bottom:after{
+  content:"";
+  position:absolute;
+  left:0;right:0;
+  height:1px;
+  background:#000;
+  bottom:0;
+}
+.bottom:after{top:0;bottom:auto}
+.flipper{
+  position:absolute;
+  z-index:5;
+  left:0;top:0;
+  width:100%;
+  height:50%;
+  overflow:hidden;
+  transform-origin:bottom;
+  background:linear-gradient(#292929,#1b1b1b);
+  font-size:clamp(50px,10vw,120px);
+  font-weight:700;
+  line-height:1;
+  transform:rotateX(0);
+  backface-visibility:hidden;
+}
+.flipper span{
+  position:absolute;
+  left:0;top:0;
+  width:100%;
+  height:200%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+.flipper.go{animation:flip .5s ease-in forwards}
+@keyframes flip{
+  from{transform:rotateX(0)}
+  to{transform:rotateX(-180deg)}
+}
+.colon{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:clamp(16px,3vw,34px);
+}
+.colon i{
+  display:block;
+  width:clamp(7px,1vw,12px);
+  height:clamp(7px,1vw,12px);
+  border-radius:50%;
+  background:#ddd;
+}
+button{
+  position:fixed;right:16px;top:16px;
+  padding:8px 12px;
+  border:1px solid #444;
+  border-radius:7px;
+  background:#1d1d1d;
+  color:#bbb;
+  cursor:pointer;
+}
+button:hover{color:white}
+.label{
+  position:fixed;bottom:18px;
+  color:#666;font-size:12px;
+  letter-spacing:.15em;
+}
+</style>
+</head>
+<body>
+<button id="fs">⛶ 全螢幕</button>
+<div class="clock">
+  <div class="group" id="hh"></div>
+  <div class="colon"><i></i><i></i></div>
+  <div class="group" id="mm"></div>
+  <div class="colon"><i></i><i></i></div>
+  <div class="group" id="ss"></div>
+</div>
+<div class="label">FLIP CLOCK</div>
+
+<script>
+const digits={};
+
+function createDigit(parent,id){
+  const d=document.createElement("div");
+  d.className="digit";
+  d.innerHTML=`
+    <div class="half top"><span>0</span></div>
+    <div class="half bottom"><span>0</span></div>
+  `;
+  parent.appendChild(d);
+  digits[id]={el:d,value:"0"};
+}
+
+["hh","mm","ss"].forEach(g=>{
+  const p=document.getElementById(g);
+  createDigit(p,g+"0");
+  createDigit(p,g+"1");
+});
+
+function setDigit(id,next){
+  const item=digits[id];
+  if(item.value===next)return;
+  const old=item.value;
+  item.value=next;
+
+  const f=document.createElement("div");
+  f.className="flipper";
+  f.innerHTML=`<span>${old}</span>`;
+  item.el.appendChild(f);
+
+  requestAnimationFrame(()=>f.classList.add("go"));
+
+  setTimeout(()=>{
+    item.el.querySelector(".top span").textContent=next;
+    item.el.querySelector(".bottom span").textContent=next;
+    f.remove();
+  },500);
+}
+
+function update(){
+  const n=new Date();
+  const h=String(n.getHours()).padStart(2,"0");
+  const m=String(n.getMinutes()).padStart(2,"0");
+  const s=String(n.getSeconds()).padStart(2,"0");
+  [h,m,s].forEach((v,g)=>{
+    setDigit(["hh","mm","ss"][g]+"0",v[0]);
+    setDigit(["hh","mm","ss"][g]+"1",v[1]);
+  });
+}
+update();
+setInterval(update,1000);
+
+document.getElementById("fs").onclick=()=>{
+  if(document.fullscreenElement) document.exitFullscreen();
+  else document.documentElement.requestFullscreen();
+};
+</script>
+</body>
+</html>
