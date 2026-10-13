@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>記帳 App</title>
+  <link rel="stylesheet" href="020-styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="header-content">
+        <h1 class="logo">
+          <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="4" width="20" height="16" rx="2"/>
+            <path d="M12 8v8M8 12h8"/>
+          </svg>
+          記帳 App
+        </h1>
+        <div class="total-card">
+          <span class="total-label">總支出</span>
+          <span class="total-amount" id="totalAmount">$0</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="card form-card">
+        <h2 class="card-title">新增支出</h2>
+        <form id="expenseForm" class="expense-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="amount">金額</label>
+              <div class="input-wrapper">
+                <span class="input-prefix">$</span>
+                <input type="number" id="amount" name="amount" min="0" step="1" placeholder="0" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="category">類別</label>
+              <select id="category" name="category" required>
+                <option value="">請選擇類別</option>
+                <option value="飲食">🍜 飲食</option>
+                <option value="交通">🚌 交通</option>
+                <option value="購物">🛒 購物</option>
+                <option value="娛樂">🎮 娛樂</option>
+                <option value="醫療">💊 醫療</option>
+                <option value="教育">📚 教育</option>
+                <option value="住房">🏠 住房</option>
+                <option value="其他">📦 其他</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="date">日期</label>
+              <input type="date" id="date" name="date" required>
+            </div>
+            <div class="form-group">
+              <label for="note">備註</label>
+              <input type="text" id="note" name="note" placeholder="選填備註...">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+            新增支出
+          </button>
+        </form>
+      </section>
+
+      <section class="card list-card">
+        <div class="list-header">
+          <h2 class="card-title">支出列表</h2>
+          <div class="list-actions">
+            <button type="button" class="btn btn-secondary" id="exportCsvBtn" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              匯出 CSV
+            </button>
+            <span class="expense-count" id="expenseCount">0 筆</span>
+          </div>
+        </div>
+        <div class="chart-section" id="chartSection">
+          <h3 class="chart-title">類別佔比</h3>
+          <div class="chart-container">
+            <div class="pie-chart-wrap">
+              <svg class="pie-chart" id="pieChart" viewBox="0 0 200 200"></svg>
+            </div>
+            <ul class="chart-legend" id="chartLegend"></ul>
+          </div>
+        </div>
+        <div class="expense-list" id="expenseList">
+          <div class="empty-state" id="emptyState">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+              <rect x="9" y="3" width="6" height="4" rx="1"/>
+              <path d="M9 12h6M9 16h4"/>
+            </svg>
+            <p>尚無支出紀錄</p>
+            <span>新增第一筆支出開始記帳吧！</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>資料儲存於瀏覽器 localStorage</p>
+    </footer>
+  </div>
+
+  <div class="toast-overlay hidden" id="toastOverlay">
+    <div class="toast-modal" role="alertdialog" aria-labelledby="toastTitle">
+      <div class="toast-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+      </div>
+      <h3 class="toast-title" id="toastTitle">已成功匯出 CSV</h3>
+      <p class="toast-message" id="toastMessage"></p>
+      <button type="button" class="btn btn-primary toast-btn" id="toastCloseBtn">確定</button>
+    </div>
+  </div>
+
+  <script src="020-app.js"></script>
+</body>
+</html>
